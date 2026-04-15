@@ -1,0 +1,201 @@
+---
+execute:               # Default settings for code blocks
+  warning: false       # Do not print warnings
+  message: false       # Do not print messages
+  size: "scriptsize"   # Set code size to script size
+
+format:
+  pdf:        # Specify .pdf formatting options 
+    documentclass: article     # Document Class
+    number-sections: true      # Number Sections
+    reference-section-title: "References" # Title for reference section
+    code-line-numbers: true    # Line numbers printed in code
+    cap-location: top          # Captions at the top of tables 
+    geometry:
+      - top=0.75in
+      - left=0.75in
+      - bottom=0.75in
+      - right=0.75in
+format-links: [pdf]
+---
+```{r}
+#| echo: false
+
+default_chunk_hook  <- knitr::knit_hooks$get("chunk")
+
+latex_font_size <- c("Huge", "huge", "LARGE", "Large", 
+                     "large", "normalsize", "small", 
+                     "footnotesize", "scriptsize", "tiny")
+
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- default_chunk_hook(x, options)
+  if(options$size %in% latex_font_size) {
+    paste0("\n \\", options$size, "\n\n", 
+      x, 
+      "\n\n \\normalsize"
+    )
+  } else {
+    x
+  }
+})
+
+```
+
+```{r}
+#| label: load-packages
+#| include: false
+library(tidyverse)
+library(rvest)
+```
+
+<!-- Code For Building Menu Here -->
+```{r}
+#| include: false
+breakfasts <- c("website/BerryMelonSmoothie.html",
+                "website/BiscuitsAndGravy.html",
+                "website/BreakfastCheesecake.html",
+                "website/BreakfastMuffins.html",
+                "website/ChiaParfait.html",
+                "website/GardenTomatoQuiche.html",
+                "website/OvernightOats.html",
+                "website/PumpkinToast.html",
+                "website/TropicalSmoothie.html")
+dinner <- c("website/AfricanPeanutSoup.html",
+            "website/Alfredo.html",
+            "website/ArugulaPasta.html",
+            "website/AutumnGrainBowl.html",
+            "website/BakedZiti.html",
+            "website/BBQChili.html",
+            "website/Bibimbap.html",
+            "website/BLTSalad.html",
+            "website/Burgers.html",
+            "website/CapreseSandwiches.html",
+            "website/EggplantParmesan.html",
+            "website/Enchiladas.html",
+            "website/FloridaRolls.html",
+            "website/KimchiGrilledCheese.html",
+            "website/Lasagna.html",
+            "website/LatinBowl.html",
+            "website/Meatloaf.html",
+            "website/PadThai.html",
+            "website/PastaAndPeas.html",
+            "website/Pizza.html",
+            "website/RedWineRagu.html",
+            "website/SalmonChowder.html",
+            "website/Shakshuka.html")
+```
+
+```{r}
+#| echo: false
+dinner.choices = sample(dinner, 3, replace=FALSE) #grabs 3 random dinners, not replace, becasue I don't want multiple of the same recipe
+bfast.choice = sample(breakfasts, 1, replace = FALSE) #one random bfast
+
+meals = c(dinner.choices,bfast.choice)
+
+```
+
+```{r}
+#| echo: false
+scrape.html = function(meal){ #takes in the link of the meal
+
+  #copying what i did in lab4:
+  recipe.item = read_html(meal)
+  recipe.title <- html_text(html_element(recipe.item, "h1")) #put this in after to save me headaches when i just want to grab this info from the function
+
+  ingredients.section = html_element(recipe.item, "#ingredients")
+  ingredients = html_elements(ingredients.section, "li")
+
+  instructions.section = html_element(recipe.item, "#instructions")
+  instructions = html_elements(instructions.section, "li")
+
+  image.element = html_element(recipe.item, ".figure-img")
+  image.url = paste("website/",html_attr(image.element, "src"), sep="")
+  
+  return(list(title = recipe.title, img.url = image.url, ingredients = ingredients, instructions = instructions))
+}
+recipes = lapply(meals,scrape.html)
+```
+
+```{r}
+#| echo: false
+#| results: "asis"
+
+print.recipe = function(recipe){ #prints recipe out according to lab4 aesthetics
+  recipe.title = recipe$title
+  img.url = recipe$img.url
+  ingredients = recipe$ingredients
+  instructions = recipe$instructions
+
+  #print img here, using cipolli code
+  cat(paste('![', recipe.title, '](', img.url, "){width=50%}", sep="")) 
+  cat("\n\n")
+
+  cat("## Ingredients\n\n") #i like the numbered sections here, i know i can remove it if wanted
+  #ingredients, using cipolli code again
+  formatted_list <- paste("-", html_text(ingredients))
+  cat(formatted_list, sep = "\n")
+
+  cat("\n\n## Instructions\n\n")
+  #instructions, using cipolli again
+  formatted_list <- paste("1.", html_text(instructions))
+  cat(formatted_list, sep = "\n")
+  
+  cat("\n\n")
+
+}
+```
+
+<!-- dont want this numbered so recipe one starts with section 1, etc. -->
+# Ingredients {.unnumbered}
+
+```{r}
+#| echo: false
+#| results: "asis"
+
+for(i in 1:length(meals)){
+  formatted_list <- paste("-", html_text(recipes[[i]]$ingredients)) #inspired by ur code in printing out the ingredients from lab4
+  cat(formatted_list, sep = "\n")
+}
+```
+
+\newpage
+
+# Recipe One
+```{r}
+#| echo: false
+#| results: "asis"
+
+print.recipe(recipes[[1]])
+```
+
+\newpage
+
+# Recipe Two
+```{r}
+#| echo: false
+#| results: "asis"
+
+print.recipe(recipes[[2]])
+```
+
+\newpage
+
+# Recipe Three
+
+```{r}
+#| echo: false
+#| results: "asis"
+
+print.recipe(recipes[[3]])
+```
+
+\newpage
+
+# Breakfast Recipe
+
+```{r}
+#| echo: false
+#| results: "asis"
+
+print.recipe(recipes[[4]])
+```
