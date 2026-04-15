@@ -1,0 +1,962 @@
+[
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html",
+    "href": "Lab5-6/Lab5WriteUp.html",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "",
+    "text": "Tips\nTimeline",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#data-wrangling",
+    "href": "Lab5-6/Lab5WriteUp.html#data-wrangling",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "1.1 Data Wrangling",
+    "text": "1.1 Data Wrangling\n\n1.1.1 Part A\nGo to the website and download the source data https://www.nature.com/articles/s41467-025-68063-y#Sec30.\nDescribe the process – do not leave out any steps – for how you can load the data for Figures 3b and 3d from the manuscript into R.\nSolution\nI first downloaded the source data onto my desktop. Then, I exported only the necessary tables, 3B, as a csv onto my desktop. I then moved the csv into my working folder. I then used ‘read.csv(…)’ to load each table into R. Bang boom shakalaka done. Yes, I also said boom shakalaka during this process, and you did say not to skip out on any steps…\n\n\n\nCode\nfig_3B = read.csv(file = \"Fig. 3B-Table 1.csv\")\n\n\n\nTHIS WAS ALL DUMB AND STUPID AND I HATE DATA NOW\nI also wanted to clean up the csv in R itself (because its good practice), but in reality I’d rather just go straight into the CSV and do all this myself. I combined the headers for the samples such that sample under primary became sample_primary and a symmetric idea for sample_thp1.\nWhat I ended up doing instead\nI went straight into the csv, stacked the two columns and deleted the extra column names (eg. primary, thp1). This made my life easier, I’m done being fancy.\n\n\n\nCode\ndat = fig_3B[,c(1,2)] #just want the first two columns\n\n\n\nHint: You can use packages like readxl (Wickham and Bryan 2025) but you will find it substantially easier to open the .xls file using your computer’s spreadsheet software and create a new .csv file with the data you need.\n\n\n1.1.2 Part B\nThe data need to be cleaned. Note that the sample type (Healthy Donor or THP-1), cell type (Monocytes or Macrophages), and treatment (12 Hours Post-Infection or Uninfected) are all recorded in one column sample, separated with underscores. Use separate(...) from the tidyverse package to separate the sample column into the SampleType, CellType, Treatment columns. Save the object as dat.kitsberg.cleaned.\nHint: Use ?separate(...) to see how it works.\nSolution\nI just used separate on my sample column, having it separate at non-alphanumeric values, such that the new columns are spit out as SampleType, CellType, and Treatment.\n\n\n\nCode\ndat.kitsberg.cleaned = dat |&gt;\n  separate(\"sample\", c(\"SampleType\", \"CellType\",\"Treatment\"))\n\n\n\n\n\n1.1.3 Part C\nThe researchers are only interested in observations in the treatment group (12hpi). Remove uninfected samples from the data. Update dat.kitsberg.cleaned with the result.\nHint: I would use the filter(...) function.\nSolution\nI use filter to only keep the observations that have a treatment of exactly 12hpi\n\n\n\nCode\ndat.kitsberg.cleaned = dat.kitsberg.cleaned |&gt;\n  filter(Treatment == \"12hpi\")\n\n\n\n\n\n1.1.4 Part D\nWhen CellType is “MDM”, it is a Monocyte-Derived Macrophages. That is, the cell type should be macrophages which is coded as “mac”. Update dat.kitsberg.cleaned with the result.\nHint: I would use the mutate(...) function. You will likely find if_else(...) or case_when(...) helpful.\nSolution\nI use mutate to change the value of MDM to mac. When it isn’t MDM, I just leave it as is.\n\n\n\nCode\ndat.kitsberg.cleaned = dat.kitsberg.cleaned |&gt;\n    mutate(CellType = case_when(\n                      CellType == \"MDM\" ~ \"mac\",\n                      .default = as.character(CellType)\n    ))",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#part-e",
+    "href": "Lab5-6/Lab5WriteUp.html#part-e",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "1.2 Part E",
+    "text": "1.2 Part E\nThe researchers are only interested in monocytes and macrophages. Remove any other cell types. Update dat.kitsberg.cleaned with the result.\nHint: I would use the filter(...) function.\nSolution\nI use filter to only grab celltypes that are either mono or mac.\n\n\n\nCode\ndat.kitsberg.cleaned = dat.kitsberg.cleaned |&gt;\n    filter(CellType == \"mono\" | CellType == \"mac\" )",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#part-f",
+    "href": "Lab5-6/Lab5WriteUp.html#part-f",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "1.3 Part F",
+    "text": "1.3 Part F\nClean up the data entry. Replace the shorthand the researchers used with the neat sample type (Healthy Donor or THP-1), cell type (Monocytes or Macrophages), and treatment (12 Hours Post-Infection or Uninfected). Update dat.kitsberg.cleaned with the result.\nHint: I would use the mutate(...) function. You will likely find if_else(...) or case_when(...) helpful.\nSolution\nI used a bunch of mutate-case_when’s. I kept using pipes to transfer the data over oafter each mutate was run so that it way it changes the data in the file all at the same time. Yipee!\n\n\n\nCode\ndat.kitsberg.cleaned = dat.kitsberg.cleaned |&gt;\n    mutate(SampleType = case_when(\n                        SampleType == \"primary\" ~ \"Healthy Donor\",\n                        SampleType == \"THP1\" ~ \"THP-1\")) |&gt;\n    mutate(CellType = case_when(\n                      CellType == \"mono\" ~ \"Monocytes\",\n                      CellType == \"mac\" ~ \"Macrophages\")) |&gt;\n    mutate(Treatment = case_when(\n                        Treatment == \"12hpi\" ~ \"12 Hours Post-Infection\"))",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#part-g",
+    "href": "Lab5-6/Lab5WriteUp.html#part-g",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "1.4 Part G",
+    "text": "1.4 Part G\nIn an R code block, combine your answers into one code block that completes the full cleaning process. Save the object as dat.kitsberg.cleaned.\nNote: You will use this in the next section\nSolution\nI do as instructions tell me… (I put my previous work in one cell block, just added pipes to pass information into each next section)\n\n\n\nCode\ndat.kitsberg.cleaned = dat |&gt;\n    separate(\"sample\", c(\"SampleType\", \"CellType\",\"Treatment\")) |&gt;\n\n    filter(Treatment == \"12hpi\") |&gt;\n    \n    mutate(CellType = case_when(\n                      CellType == \"MDM\" ~ \"mac\",\n                      .default = as.character(CellType))) |&gt;\n    \n    filter(CellType == \"mono\" | CellType == \"mac\" ) |&gt;\n\n    mutate(SampleType = case_when(\n                        SampleType == \"primary\" ~ \"Healthy Donor\",\n                        SampleType == \"THP1\" ~ \"THP-1\")) |&gt;\n    mutate(CellType = case_when(\n                      CellType == \"mono\" ~ \"Monocytes\",\n                      CellType == \"mac\" ~ \"Macrophages\")) |&gt;\n    mutate(Treatment = case_when(\n                        Treatment == \"12hpi\" ~ \"12 Hours Post-Infection\"))",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#data-summaries",
+    "href": "Lab5-6/Lab5WriteUp.html#data-summaries",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "1.5 Data Summaries",
+    "text": "1.5 Data Summaries\n\n1.5.1 Part A\nRecreate Figure 3b as depicted in the paper (see https://www.nature.com/articles/s41467-025-68063-y#Fig3). You can ignore the significance comparison because we haven’t done that yet.\nHint: I would use geom_violin(...) for Figure 3b I also expect your plots to look nicer – better labels, better scaling, etc. Don’t forget to use the proper formatting using the syntax in the Quarto cheatsheet.\nSolution\nI made a violin plot using notes from class, added jitter as well. Followed class notes for assistance. Used facet wrap to create two sections, one for Healthy Donors and one for those with THP-1. I also decided to keep the trim on my violin plots because it doesn’t make physical sense to have negative genome counts in the plot.\n\n\n\nCode\nggplot(dat.kitsberg.cleaned)+\n  geom_violin(aes(x=CellType, y = viruses.within.nucleus), \n                  fill = \"lightgrey\", alpha = 1) +\n  geom_jitter(aes(x=CellType, y=viruses.within.nucleus), \n                  width = 0.02, height = 0.2, \n                  alpha = 0.15) +\n  theme_bw()+\n  labs(x=\"Cell Type\", y= \"HCMV Genomes in the Nucleus\")+\n  ggtitle(\"HCMV Genomes in Monocytes vs Macrophages\")+\n  facet_wrap(~SampleType)\n\n\n\n\n\n\n\n\n\n\n\n\n1.5.2 Part B\nCompute a table containing relevant numerical summaries for Figure 3b.\nHint: I would use group_by(...) and summarize(...) to complete this. Don’t forget to use the proper formatting using knitr::kable(...) as described in the Quarto Cheatsheet.\nSolution\nHere, I included all the relevant numerical summaries. I decided not to include min, since it would always be 0. I also didn’t include skewness or excess kurtosis since it isn’t too useful for the small discrete values given.\n\n\n\nCode\ndat.kitsberg.cleaned |&gt;\n  group_by(SampleType, CellType) |&gt;\n  summarize(\n    n = n(),\n    Mean = mean(viruses.within.nucleus),\n    Median = median(viruses.within.nucleus),\n    Max = max(viruses.within.nucleus),\n    IQR = IQR(viruses.within.nucleus)\n  ) |&gt;\n  knitr::kable()\n\n\n\n\n\nSampleType\nCellType\nn\nMean\nMedian\nMax\nIQR\n\n\n\n\nHealthy Donor\nMacrophages\n93\n0.3655914\n0\n3\n1\n\n\nHealthy Donor\nMonocytes\n87\n0.0114943\n0\n1\n0\n\n\nTHP-1\nMacrophages\n170\n0.3294118\n0\n2\n1\n\n\nTHP-1\nMonocytes\n112\n0.0446429\n0\n2\n0",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#data-wrangling-1",
+    "href": "Lab5-6/Lab5WriteUp.html#data-wrangling-1",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "2.1 Data Wrangling",
+    "text": "2.1 Data Wrangling\n\n2.1.1 Part A\nI downloaded the data from linked in the article (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0319073). I have included the data in this lab folder as ShipValuation-Bal25.csv. Load the data into R.\nSolution\nI loaded the data in using read.csv. At a quick glance, csv looks fine at least in shape.\n\n\n\nCode\ndat = read.csv(file = \"ShipValuation-Bal25.csv\")\n\n\n\n\n\n2.1.2 Part B\nThe price of each Supramax and Ultramax ship is reported on the \\(\\log_{10}\\) scale. Create a new column called price that contains the price in millions of dollars. \\[\\text{Price} = \\frac{10^{\\text{SPLog}}}{1000000}\\] Save the object as dat.bal.cleaned.\nHint: I would use the mutate(...) function.\nSolution\nI use mutate here to create a new price column in the df such that price is reflected in millions\n\n\n\nCode\ndat.bal.cleaned = dat |&gt;\n  mutate(\"price\" = (10^SPLog)/1000000)\n\n\n\n\n\n2.1.3 Part C\nThe authors recorded the country that each Supramax or Ultramax ship was built in in the columns Japan, China, People's Republic Of, Philippines, Korea, South, Others Country Build. These columns are marked 1 to indicate that is the country of origin and 0 otherwise. Create a new column called OriginCountry that contains a clean labels for the country in which the ship was built. Update dat.bal.cleaned with the result.\nHint: I would use the mutate(...) function. You will likely find if_else(...) or case_when(...) helpful.\nSolution\nThis creates a new column, OriginCountry, and places country name depnding on my case_when which checks what value has a 1, or True, value in the corresponding country column. I placed a default else case for weird values, just in case. I did a “table(dat.bal.cleaned$OriginCountry)” and it looked good (all 1819 values).\n\n\n\nCode\ndat.bal.cleaned = dat.bal.cleaned |&gt;\n  mutate(\n    OriginCountry = case_when(\n      Japan == 1 ~ \"Japan\",\n      China..People.s.Republic.Of == 1 ~ \"China\",\n      Philippines == 1 ~ \"Philippines\",\n      Korea..South == 1 ~ \"South Korea\",\n      Others.Country.Build == 1 ~ \"Other\",\n      .default = NA_character_ #had to look this up for the default else case...\n    )\n  )\n\n(table(dat.bal.cleaned$OriginCountry))\n\n\n\n      China       Japan       Other Philippines South Korea \n        613         898         103         130          75 \n\n\n\n\n\n2.1.4 Part D\nThe authors recorded each Supramax and Ultramax ship’s main engine manufacturer in the columns Caterpillar, MAN-B&W, Wartsila, Mitsubishi. These columns are marked 1 to indicate that is the manufacturer and 0 otherwise. Create a new column called Manufacturer that contains a clean labels for the manufacturer. Update dat.bal.cleaned with the result.\nHint: Follow the logic of the previous question.\nSolution\nVery similar process to previous question. Just made it work for the manufacturer column. Basically just copy paste here. Summed to 1819 here as well.\n\n\n\nCode\ndat.bal.cleaned = dat.bal.cleaned |&gt;\n  mutate(\n    Manufacturer = case_when(\n      Caterpillar == 1 ~ \"Caterpillar\",\n      MAN.B.W == 1 ~ \"MAN-B&W\",\n      Wartsila == 1 ~ \"Wartsila\",\n      Mitsubishi == 1 ~ \"Mitsubishi\",\n      .default = NA_character_ #had to look this up for the default else case...\n    )\n  )\n(table(dat.bal.cleaned$Manufacturer))\n\n\n\nCaterpillar     MAN-B&W  Mitsubishi    Wartsila \n          2        1588          63         166 \n\n\n\n\n\n2.1.5 Part E\nThe researchers recorded whether each Supramax and Ultramax ship is currently covered by a Protection and Indemnity (P&I) Club. This can be an indicator that a ship meets the minimum seaworthiness and safety requirements of the insurer.\nThe authors recorded P&I clubs in the columns Japan P&I Club, Gard, West of England, North of England, UK P&I, Britannia P&I, London P&I Club, Skuld, Steamship Mutual, Others, Unknown. These columns are marked 1 to indicate that the ship is insured by that P&I club and 0 otherwise. Create a new column called PI.club that contains a clean labels for the P&I club. Update dat.bal.cleaned with the result.\nHint: Follow the logic of the previous questions.\nSolution\nVery similar process to previous question. Just made it work for the PI club column. Basically just copy paste here. Summed to 1819 here as well.\n\n\n\nCode\ndat.bal.cleaned = dat.bal.cleaned |&gt;\n  mutate(\n    PI.club = case_when(\n      Japan.P.I.Club == 1 ~ \"Japan P&I Club\",\n      Gard == 1 ~ \"Gard\",\n      West.of.England == 1 ~ \"West of England\",\n      North.of.England == 1 ~ \"North of England\",\n      UK.P.I == 1 ~ \"UK P&I\",\n      Britannia.P.I == 1 ~ \"Britannia P&I\",\n      London.P.I.Club == 1 ~ \"London P&I Club\",\n      Skuld == 1 ~ \"Skuld\",\n      Steamship.Mutual == 1 ~ \"Steamship Mutual\",\n      Others == 1 ~ \"Others\",\n      Unknown == 1 ~ \"Unknown\",\n      .default = NA_character_ #had to look this up for the default else case...\n    )\n  )\n(table(dat.bal.cleaned$PI.club))\n\n\n\n   Britannia P&I             Gard   Japan P&I Club  London P&I Club \n             146              224              244              136 \nNorth of England           Others            Skuld Steamship Mutual \n             182              243              117               88 \n          UK P&I          Unknown  West of England \n             165               73              201 \n\n\n\n\n\n2.1.6 Part F\nThe researchers recorded whether each Supramax and Ultramax ship is classed by a society that requires a ship to be safe, structurally sound, and built/maintained to specific engineering standards.\nThe authors recorded class society in the columns Nippon Kaiji Kyokai (IACS), Lloyd's Register, Bureau Veritas (IACS), Det Norske Veritas (IACS), American Bureau of Shipping (IACS), Others Class, With Two Classes, Disclassed. These columns are marked 1 to indicate that the ship is classed by that soceity and 0 otherwise. Create a new column called Class that contains a clean labels for the class. Update dat.bal.cleaned with the result.\nHint: Follow the logic of the previous questions.\nSolution\nVery similar process to previous question. Just made it work for the class column. Basically just copy paste here. Summed to 1819 here as well.\n\n\n\nCode\ndat.bal.cleaned = dat.bal.cleaned |&gt;\n  mutate(\n    Class = case_when(\n      Nippon.Kaiji.Kyokai..IACS. == 1 ~ \"Nippon Kaiji Kyokai (IACS)\",\n      Lloyd.s.Register == 1 ~ \"Lloyd's Register\",\n      Bureau.Veritas..IACS. == 1 ~ \"Bureau Veritas (IACS)\",\n      Det.Norske.Veritas..IACS. == 1 ~ \"Det Norske Veritas (IACS)\",\n      American.Bureau.of.Shipping..IACS. == 1 ~ \"American Bureau of Shipping (IACS)\",\n      Others.Class == 1 ~ \"Others Class\",\n      With.Two.Classes == 1 ~ \"With Two Classes\",\n      Disclassed == 1 ~ \"Disclassed\",\n      .default = NA_character_#had to look this up for the default else case...\n    )\n  )\n(table(dat.bal.cleaned$Class))\n\n\n\nAmerican Bureau of Shipping (IACS)              Bureau Veritas (IACS) \n                               170                                237 \n         Det Norske Veritas (IACS)                         Disclassed \n                               173                                  6 \n                  Lloyd's Register         Nippon Kaiji Kyokai (IACS) \n                               269                                734 \n                      Others Class                   With Two Classes \n                               203                                 27 \n\n\n\n\n\n2.1.7 Part G\nThe researchers recorded the flag state of each Supramax and Ultramax ship. Each flag state enforces its own set of safety, environmental, and crew welfare rules and regulations. Ships under certain flag states may be more or less valuable depending on how much the flag affects the buyer’s trust in the condition of the boat.\nThe authors recorded flag states in the columns Panama, Marshall Islands, Liberia, Malta, Hong Kong, China, Singapore, Others Flag, With two flags. These columns are marked 1 to indicate that the ship has that flag state and 0 otherwise. Create a new column called FlagState that contains a clean labels for the flag state. Update dat.bal.cleaned with the result.\nHint: Follow the logic of the previous questions.\nSolution\nVery similar process to previous question. Just made it work for the flag state column. Basically just copy paste here. Summed to 1819 here as well.\n\n\n\nCode\ndat.bal.cleaned = dat.bal.cleaned |&gt;\n  mutate(\n    FlagState = case_when(\n      Panama == 1 ~ \"Panama\",\n      Marshall.Islands == 1 ~ \"Marshall Islands\",\n      Liberia == 1 ~ \"Liberia\",\n      Malta == 1 ~ \"Malta\",\n      Hong.Kong..China == 1 ~ \"Hong Kong\",\n      Singapore == 1 ~ \"Singapore\",\n      Others.Flag == 1 ~ \"Others Flag\",\n      With.two.flags == 1 ~ \"With two flags\",\n      .default = NA_character_\n    )\n  )\n(table(dat.bal.cleaned$FlagState))\n\n\n\n       Hong Kong          Liberia            Malta Marshall Islands \n             147              166              124              284 \n     Others Flag           Panama        Singapore   With two flags \n             362              536              127               73",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#part-h",
+    "href": "Lab5-6/Lab5WriteUp.html#part-h",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "2.2 Part H",
+    "text": "2.2 Part H\nIn an R code block, combine your answers into one code block that completes the full cleaning process. Save the object as dat.bal.cleaned.\nNote: You will use this in the next section\nSolution\nCopy pasted all sections into here to create one code pipeline. Very easy and readable.\n\n\n\nCode\ndat.bal.cleaned &lt;- dat |&gt;\n#price section:\n  mutate(price = (10^SPLog) / 1000000) |&gt;\n#country origin:\n  mutate(\n    OriginCountry = case_when(\n      Japan == 1 ~ \"Japan\",\n      China..People.s.Republic.Of == 1 ~ \"China\",\n      Philippines == 1 ~ \"Philippines\",\n      Korea..South == 1 ~ \"South Korea\",\n      Others.Country.Build == 1 ~ \"Other\",\n      .default = NA_character_\n    )) |&gt;\n#manufacturer section:\n  mutate(\n    Manufacturer = case_when(\n      Caterpillar == 1 ~ \"Caterpillar\",\n      MAN.B.W == 1 ~ \"MAN-B&W\",\n      Wartsila == 1 ~ \"Wartsila\",\n      Mitsubishi == 1 ~ \"Mitsubishi\",\n      .default = NA_character_\n    )) |&gt;\n#PI club section:\n  mutate(\n    PI.club = case_when(\n      Japan.P.I.Club == 1 ~ \"Japan P&I Club\",\n      Gard == 1 ~ \"Gard\",\n      West.of.England == 1 ~ \"West of England\",\n      North.of.England == 1 ~ \"North of England\",\n      UK.P.I == 1 ~ \"UK P&I\",\n      Britannia.P.I == 1 ~ \"Britannia P&I\",\n      London.P.I.Club == 1 ~ \"London P&I Club\",\n      Skuld == 1 ~ \"Skuld\",\n      Steamship.Mutual == 1 ~ \"Steamship Mutual\",\n      Others == 1 ~ \"Others\",\n      Unknown == 1 ~ \"Unknown\",\n      .default = NA_character_\n    )) |&gt;\n#class section:\n  mutate(\n    Class = case_when(\n      Nippon.Kaiji.Kyokai..IACS. == 1 ~ \"Nippon Kaiji Kyokai (IACS)\",\n      Lloyd.s.Register == 1 ~ \"Lloyd's Register\",\n      Bureau.Veritas..IACS. == 1 ~ \"Bureau Veritas (IACS)\",\n      Det.Norske.Veritas..IACS. == 1 ~ \"Det Norske Veritas (IACS)\",\n      American.Bureau.of.Shipping..IACS. == 1 ~ \"American Bureau of Shipping (IACS)\",\n      Others.Class == 1 ~ \"Others Class\",\n      With.Two.Classes == 1 ~ \"With Two Classes\",\n      Disclassed == 1 ~ \"Disclassed\",\n      .default = NA_character_\n    )) |&gt;\n#flag state section:\n  mutate(\n    FlagState = case_when(\n      Panama == 1 ~ \"Panama\",\n      Marshall.Islands == 1 ~ \"Marshall Islands\",\n      Liberia == 1 ~ \"Liberia\",\n      Malta == 1 ~ \"Malta\",\n      Hong.Kong..China == 1 ~ \"Hong Kong\",\n      Singapore == 1 ~ \"Singapore\",\n      Others.Flag == 1 ~ \"Others Flag\",\n      With.two.flags == 1 ~ \"With two flags\",\n      .default = NA_character_\n    ))",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab5-6/Lab5WriteUp.html#data-summaries-1",
+    "href": "Lab5-6/Lab5WriteUp.html#data-summaries-1",
+    "title": "Lab Five-Six – Data Wrangling in R",
+    "section": "2.3 Data Summaries",
+    "text": "2.3 Data Summaries\nFirst, I provide a short description of the other variables in their data. Note that the size ordering of types of ships discussed below is:\n\\[\\text{Handysize} &lt; \\text{Supramax} &lt; \\text{Ultramax} &lt; \\text{Panamax} &lt; \\text{Capesize}\\]\n\nDWT: The deadweight tonnage, which is the maximum weight each Supramax and Ultramax ship can safely carry in metric tons. This gives a measure of how much cargo, fuel, fresh water, ballast water, provisions, and crew a ship can handle.\nYas: The age in years. New Supramax and Ultramax ships were recorded as having age 1.\nEnginges RPM: Revolutions per minute of each Supramax and Ultramax ship’s main propulsion engine. Generally speaking, lower-RPM engines are more expensive because they are more fuel efficient.\nBACI: The Baltic Capesize Index. This describes freight rates for Capesize dry bulk ships, which reflects supply and demand. When BACI is high, Capesize ships are more profitable in shipping, which could positively affect Supramax and Ultramax ship values as demand for dry bulk commodities might be high and large shipments could be split into several Supramax and Ultramax shipments.\nNote: This reports the current BACI. The data also contain the BACI form 1, 2, and 3 months before the sale (BACI-1, BACI-2, BACI-3).\nBPNI: The Baltic Panamax Index. This describes the cost to ship dry bulk commodities (e.g., coal or grain) on Panamax class ships. When BPNI is high, we expect Panamax ship prices to go up. Supramax and Ultramax ship values tend to follow this trend as charterers switch to these smaller vessels when Panamax rates become too expensive.\nNote: This reports the current BPNI. The data also contain the BPNI form 1, 2, and 3 months before the sale (BPNI-1, BPNI-2, BPNI-3).\nBSIS: The Baltic Supramax Index. This describes freight rates for Supramax vessels, which reflects supply and demand. When BSIS is high, Supramax and Ultramax prices are usually higher because they are more profitable in shipping.\nNote: This reports the current BSIS. The data also contain the BSIS form 1, 2, and 3 months before the sale (BSIS-1, BSIS-2, BSIS-3).\nBHSI: The Baltic Handysize Index. This describes freight rates for handysize vessels. When BHSI is high, Supramax and Ultramax ship prices are usually higher because the prices move together.\nNote: This reports the current BHSI. The data also contain the BHSI form 1, 2, and 3 months before the sale (BHSI-1, BHSI-2, BHSI-3).\nLIBOR: The London InterBank Offered Rate. This describes the average reported interest rate at which banks would lend US dollars for 3 months.\n\n\n2.3.1 Part A\nChoose a categorical variable. Create a plot and corresponding numerical summary to assess whether or how ship prices vary across the levels of the selected categorical variable.\nSolution\nI’ve chose OriginCountry as my categorical variable so i can see how price is affected by where the ship is built. I’ve used a boxplot to best represent how the categorical variable has an affect on a quantitive value (price). I also remembered to drop the NA values from the OriginCountry column as that was not done before.\nFor the numerical summary, I decided to include all statistics we have learned about so far, as it is relevant for such a large dataset, and all info was telling about the data.\n\n\n\nCode\nggplot(dat.bal.cleaned |&gt; drop_na(OriginCountry))+\n  geom_boxplot(aes(x=OriginCountry, y = price), \n                  fill=\"lightgrey\")+\n  theme_bw()+\n  labs(x=\"Country of Origin\", y=\"Ship Price (in Millions of US Dollars)\")+\n  ggtitle(\"Ship Prices by Country of Origin\")\n\n\n\n\n\n\n\n\n\n\n\n\n\nCode\ndat.bal.cleaned |&gt;\n  drop_na(OriginCountry) |&gt;\n  group_by(OriginCountry) |&gt;\n  summarize(\n    n = n(),\n    Mean = mean(price),\n    Median = median(price),\n    SD = sd(price),\n    IQR = IQR(price),\n    Min = min(price),\n    Max = max(price),\n    \"Excess Kurtosis\" = e1071::kurtosis(price),\n    Skew = e1071::skewness(price)\n  ) |&gt;\n  knitr::kable()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nOriginCountry\nn\nMean\nMedian\nSD\nIQR\nMin\nMax\nExcess Kurtosis\nSkew\n\n\n\n\nChina\n613\n16.80350\n14.50\n10.391663\n10.650\n3.00000\n85.0\n8.629390\n2.292270\n\n\nJapan\n898\n16.86071\n14.20\n11.846689\n13.700\n2.10000\n80.0\n6.523771\n2.075241\n\n\nOther\n103\n11.80471\n9.40\n7.375389\n8.417\n2.40000\n46.5\n3.656655\n1.628770\n\n\nPhilippines\n130\n17.07369\n14.35\n10.255985\n10.875\n3.20000\n75.5\n6.728537\n1.891443\n\n\nSouth Korea\n75\n14.63958\n11.20\n10.316007\n11.450\n2.37069\n54.0\n3.106266\n1.654895\n\n\n\n\n\n\n\n\n2.3.2 Part B\nChoose a quantitative variable. Create a plot and corresponding numerical summary to assess whether or how ship prices vary with the selected quantitative variable.\nSolution\nHere, I am going to use Yas as my quantitative variable to show how age affects sale price of ships. I was thinking of using a scatterplot but the discrete feature of the years made it look rough, so I opted for a histogram which better shows the decline of price with ship age.\nFor the numerical summary, i created age groups so i could group by them, so the summary is more relevant for what age the ships arre around.\n\n\n\nCode\nggplot(dat.bal.cleaned, aes(x = Yas, y = price)) +\n  geom_point(color = \"black\") +\n  \n  theme_bw() +\n  labs(x = \"Ship Age (Years)\",\n       y = \"Ship Price (in Millions of US Dollars)\") +\n  ggtitle(\"Ship Price vs Ship Age\")\n\n\n\n\n\n\n\n\n\n\n\n\n\nCode\ndat.bal.cleaned = dat.bal.cleaned |&gt;\n  mutate(AgeGroup = case_when(\n          Yas &lt;= 10 ~ \"0-10\",\n          Yas &lt;= 20 ~ \"11-20\",\n          Yas &lt;= 30 ~ \"21-30\",\n          Yas &lt;= 40 ~ \"31-40\"\n  ))\n\ndat.bal.cleaned |&gt;\n  group_by(AgeGroup) |&gt;\n  drop_na(price) |&gt;\n  summarize(\n    n = n(),\n    Mean = mean(price),\n    Median = median(price),\n    SD = sd(price),\n    IQR = IQR(price),\n    Min = min(price),\n    Max = max(price),\n    \"Excess Kurtosis\" = e1071::kurtosis(price),\n    Skew = e1071::skewness(price)\n  ) |&gt;\n  knitr::kable()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAgeGroup\nn\nMean\nMedian\nSD\nIQR\nMin\nMax\nExcess Kurtosis\nSkew\n\n\n\n\n0-10\n1098\n20.354548\n17.935000\n11.830042\n12.800000\n3.600000\n85.0\n6.2866001\n2.0636692\n\n\n11-20\n528\n10.784115\n9.350000\n5.171349\n7.650000\n2.100000\n46.5\n3.8052197\n1.2015241\n\n\n21-30\n182\n10.314191\n6.927560\n8.166906\n7.437500\n3.200000\n38.0\n2.4396161\n1.8005312\n\n\n31-40\n11\n4.945899\n4.441866\n1.664134\n1.741301\n2.407495\n8.2\n-0.8040503\n0.5111135",
+    "crumbs": [
+      "Lab Five-Six -- Data Wrangling in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html",
+    "href": "Lab4/Lab4WriteUp.html",
+    "title": "Lab Four – Programming in R",
+    "section": "",
+    "text": "In this lab, we will build a mealkit recipe generator. I created a small website of about 40 recipes. We will scrape recipes from that website, randomly select three meals, and print a grocery list with recipe cards.",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-a",
+    "href": "Lab4/Lab4WriteUp.html#part-a",
+    "title": "Lab Four – Programming in R",
+    "section": "1.1 Part a",
+    "text": "1.1 Part a\nBelow, I create a numeric vector filled with random observations. Ask for the 3rd item. Note: The set.seed(7272) portion ensures we all get the same answer.\n\n\n\nCode\nset.seed(7272) # sets the randomization seed for replication\nx &lt;- sample(x=1:10,          # sample from 1, 2, 3, ..., 10 \n            size=10,         # sample of 10\n            replace = TRUE)  # allowed to sample the same item multiple times\n\n\n\nSolution\nI am going to directly grab the 3rd item using the square bracket notation.\n\n\n\nCode\n(x[3])\n\n\n[1] 5",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-b",
+    "href": "Lab4/Lab4WriteUp.html#part-b",
+    "title": "Lab Four – Programming in R",
+    "section": "1.2 Part b",
+    "text": "1.2 Part b\nBelow, I create a data frame filled with random observations.\n\n\n\nCode\nset.seed(7272) # sets the randomization seed for replication\ndf &lt;- data.frame(x1 = sample(x=1:10,          # sample from 1, 2, 3, ..., 10 \n                             size=10,         # sample of 10\n                             replace = TRUE), # allowed to sample the same item multiple times\n                 x2 = sample(x=1:10,          # sample from 1, 2, 3, ..., 10 \n                             size=10,         # sample of 10\n                             replace = TRUE), # allowed to sample the same item multiple times\n                 x3 = sample(x=1:10,          # sample from 1, 2, 3, ..., 10 \n                             size=10,         # sample of 10\n                             replace = TRUE)  # allowed to sample the same item multiple times,\n)",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-b-1",
+    "href": "Lab4/Lab4WriteUp.html#part-b-1",
+    "title": "Lab Four – Programming in R",
+    "section": "1.3 Part b",
+    "text": "1.3 Part b\nUse the head(...) function to peek at the data frame.\nSolution\nI use head(…) here to get the first 6 rows of the data frame.\n\n\n\nCode\nhead(df)\n\n\n  x1 x2 x3\n1  8  1  8\n2  3  7  2\n3  5  3  3\n4  3  6  2\n5  2  2  3\n6  3  8 10",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-c",
+    "href": "Lab4/Lab4WriteUp.html#part-c",
+    "title": "Lab Four – Programming in R",
+    "section": "1.4 Part c",
+    "text": "1.4 Part c\nAsk for the column x1.\nSolution\nI use the dollarsign notation to ask for which column I want to look at. I could also use the bracket notation if I wanted.\n\n\n\nCode\n(df$x1)\n\n\n [1] 8 3 5 3 2 3 1 2 6 2",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-d",
+    "href": "Lab4/Lab4WriteUp.html#part-d",
+    "title": "Lab Four – Programming in R",
+    "section": "1.5 Part d",
+    "text": "1.5 Part d\nAsk for the fifth row of the data frame.\nSolution\nI use the bracket notation to grab my specific row from the df.\n\n\n\nCode\n(df[5,])\n\n\n  x1 x2 x3\n5  2  2  3",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-e",
+    "href": "Lab4/Lab4WriteUp.html#part-e",
+    "title": "Lab Four – Programming in R",
+    "section": "1.6 Part e",
+    "text": "1.6 Part e\nAsk for the the value of x1 in the fifth row of the data frame.\nSolution\nI use bracket notation and dollar sign notation here.\n\n\n\nCode\n(df[5,\"x1\"])\n\n\n[1] 2\n\n\nCode\n(df[5,]$x1)\n\n\n[1] 2",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-f",
+    "href": "Lab4/Lab4WriteUp.html#part-f",
+    "title": "Lab Four – Programming in R",
+    "section": "1.7 Part f",
+    "text": "1.7 Part f\nAsk for the the value of in the third column and the fifth row of the data frame.\nSolution\nI use bracket notation here. I could also do dollarsign notation.\n\n\n\nCode\n(df[5,\"x3\"])\n\n\n[1] 3",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-g",
+    "href": "Lab4/Lab4WriteUp.html#part-g",
+    "title": "Lab Four – Programming in R",
+    "section": "1.8 Part g",
+    "text": "1.8 Part g\nCreate a sequence from 1 to 10 by 2 and use it to print the odd rows of the data frame.\nSolution\nI create my odds vector first. Then I use bracket notation wth my vector as an argument for the rows place to grab only odd rows.\n\n\n\nCode\nodds = seq(1,10,2)\n(df[odds,])\n\n\n  x1 x2 x3\n1  8  1  8\n3  5  3  3\n5  2  2  3\n7  1 10  1\n9  6  2 10",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-h",
+    "href": "Lab4/Lab4WriteUp.html#part-h",
+    "title": "Lab Four – Programming in R",
+    "section": "1.9 Part h",
+    "text": "1.9 Part h\nBelow, I create an empty column called x12. Fill in the details of the for(...) loop to ensure x12 is the product of x1 and x2.\nSolution\nI filled in loop making sure to have my iterator i hold place in which spot of column of x12 I am filling and using the same i to grab the right index from x1 and x2 to multiply together.\n\n\n\nCode\nn &lt;- nrow(df)                # How many rows to we have to fill?\ndf$x12 &lt;- rep(NA, nrow(df))   # Create an empty column for x12\nfor(i in 1:nrow(df)){\n  df$x12[i] = df$x1[i] * df$x2[i]\n}\n(df$x1)\n\n\n [1] 8 3 5 3 2 3 1 2 6 2\n\n\nCode\n(df$x2)\n\n\n [1]  1  7  3  6  2  8 10  6  2  4\n\n\nCode\n(df$x12)\n\n\n [1]  8 21 15 18  4 24 10 12 12  8",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-i",
+    "href": "Lab4/Lab4WriteUp.html#part-i",
+    "title": "Lab Four – Programming in R",
+    "section": "1.10 Part i",
+    "text": "1.10 Part i\nWrite a function called calculate.score(...) that takes three arguments representing x1, x2, and x3) and returns a single value based on the formula: \\[Score = (x_1 \\times 2) + x_2 - x_3\\] Use your function to create a new column total.score in our data frame df.\nSolution\nMade my function taking in specifc columns. Use those columns as vectors in my function to evaluate score. put scores in its own vector. return the vector. then set the new column in the df to my returned vector. boom done.\n\n\n\nCode\ncalculate.score = function(x1, x2,x3){\n\n    total.score = rep(NA, length(x1))\n    for(i in 1:length(x1)){\n      total.score[i] = (x1[i]*2) + x2[i] - x3[i]\n    }\n    return(total.score)\n}\ndf$total.score =  calculate.score(df$x1,df$x2,df$x3)\n(df$total.score)\n\n\n [1]  9 11 10 10  3  4 11  9  4  7",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-j",
+    "href": "Lab4/Lab4WriteUp.html#part-j",
+    "title": "Lab Four – Programming in R",
+    "section": "1.11 Part j",
+    "text": "1.11 Part j\nCreate a function called evaluate.row(...) that takes one argument and returns “low” when the argument is less than 4, “mid” when the argument is between 4 and 7 (inclusive), and “high” when the arguement is 8 or larger. Then, use sapply(...) to apply it to column x1.\nSolution\nI made the function here. It uses if, else if, else to evaluate the three cases the integer could fall into. Then i use sapply to apply the function to the entire column x1 in the df. It acts like a nice for loop to keep applying the function to each number in the vector column.\n\n\n\nCode\neval.row = function(num){\n  if(num&lt;4){\n    return(\"low\")\n  } else if(num&gt;=8){\n    return(\"high\")\n  }else{\n    return(\"mid\")\n  }\n}\n(df$x1)\n\n\n [1] 8 3 5 3 2 3 1 2 6 2\n\n\nCode\n(sapply(df$x1,eval.row))\n\n\n [1] \"high\" \"low\"  \"mid\"  \"low\"  \"low\"  \"low\"  \"low\"  \"low\"  \"mid\"  \"low\"",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-k",
+    "href": "Lab4/Lab4WriteUp.html#part-k",
+    "title": "Lab Four – Programming in R",
+    "section": "1.12 Part k",
+    "text": "1.12 Part k\nDid we need to use loops or functions in (h.)-(j.)? That is, can we use vectorization to attain the same results in 1 line each? Where it is possible, write the line of code. Where it is not, explain why.\nSolution\nI can use the power of element-wise vector multiplication for part h.\n\n\n\nCode\n(df$x12 = df$x1*df$x2)\n\n\n [1]  8 21 15 18  4 24 10 12 12  8\n\n\n\nAgain here I can use element-wise addition, subtraction, and multiplication to recreate our previous results in part i.\n\n\n\nCode\n(df$total.score = df$x1*2 + df$x2 - df$x3)\n\n\n [1]  9 11 10 10  3  4 11  9  4  7\n\n\n\nI can use nested ifelse conditions to alsp make my part j results into just one line of code.\n\n\n\nCode\n(outcome = ifelse(df$x1&gt;=8,\"high\", ifelse(df$x1&lt;4, \"low\", \"mid\")))\n\n\n [1] \"high\" \"low\"  \"mid\"  \"low\"  \"low\"  \"low\"  \"low\"  \"low\"  \"mid\"  \"low\"",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-a-1",
+    "href": "Lab4/Lab4WriteUp.html#part-a-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.1 Part a",
+    "text": "2.1 Part a\nInstall and load the rvest package (Wickham 2025).\nSolution\nI install and load the library here. I put eval: false, so it doesnt run every time I preview the doc.\n\n\n\nCode\ninstall.packages(\"rvest\")\n\n\n\n\n\n\nCode\nlibrary(\"rvest\")",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-b-2",
+    "href": "Lab4/Lab4WriteUp.html#part-b-2",
+    "title": "Lab Four – Programming in R",
+    "section": "2.2 Part b",
+    "text": "2.2 Part b\nLoad the html of the website/KimchiGrilledCheese.html using the read_html() function and save the result to an object called recipe.item. We will use the Kimchi Grilled Cheese recipe as our prototype and extend this workflow to all recipes, so try to be as general as possible. If you do look at it, you’ll notice it contains the html we saw in the developer tools in class. Hint: You can use read_html(...) like read.csv(...). Don’t forget you can use the documentation to help use it.\nSolution\nJust had to make sure I was in the right working directory here. All else is good here.\n\n\n\nCode\nrecipe.item = read_html(\"website/KimchiGrilledCheese.html\")",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-c-1",
+    "href": "Lab4/Lab4WriteUp.html#part-c-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.3 Part c",
+    "text": "2.3 Part c\nOpen the html file in a web browser and open developer tools. In chrome-based browsers, you can do this by pressing the three verticle dots in the upper-right corner, clicking “more tools”, then “developer tools”.\nFind the name of the Ingredients section of the website and pull the HTML of the function using html_element(...) and save the results to an object called ingredients.section.  Hint: You can ask for elements by id using a preceeding “#”. See ?html_element(...) for a helpful example.\nSolution\nUsed html_element with the id I found using developer tools.\n\n\n\nCode\n(ingredients.section = html_element(recipe.item, \"#ingredients\"))\n\n\n{html_node}\n&lt;section id=\"ingredients\" class=\"level2\"&gt;\n[1] &lt;h2 class=\"anchored\" data-anchor-id=\"ingredients\"&gt;Ingredients&lt;/h2&gt;\n[2] &lt;ul&gt;\\n&lt;li&gt;1/8 tsp chili flakes&lt;/li&gt;\\n&lt;li&gt;4 garlic cloves&lt;/li&gt;\\n&lt;li&gt;5 oz s ...",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-d-1",
+    "href": "Lab4/Lab4WriteUp.html#part-d-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.4 Part d",
+    "text": "2.4 Part d\nNow, we want to obtain all of the itemized items. Find the element type the individual ingredients and pull all of them from ingredients.section using html_elements(...) (note the added s) and save the results to an object called ingredients. Hint: You can ask for elements by type by simply specifying the tag (e.g., “p” for paragraph). See `?html_element for a helpful example.\nSolution\nFound the type of the elements and searched from ingredients section.\n\n\n\nCode\ningredients = html_elements(ingredients.section,\"li\")\n(ingredients)\n\n\n{xml_nodeset (9)}\n[1] &lt;li&gt;1/8 tsp chili flakes&lt;/li&gt;\n[2] &lt;li&gt;4 garlic cloves&lt;/li&gt;\n[3] &lt;li&gt;5 oz spinach&lt;/li&gt;\n[4] &lt;li&gt;1 tsp gochujang&lt;/li&gt;\n[5] &lt;li&gt;3 tsp mayonnaise&lt;/li&gt;\n[6] &lt;li&gt;2/3 cup kimchi&lt;/li&gt;\n[7] &lt;li&gt;4 slices of bread&lt;/li&gt;\n[8] &lt;li&gt;2/3 cup cheddar cheese&lt;/li&gt;\n[9] &lt;li&gt;4 tablespoons everything seasoning.&lt;/li&gt;",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-e-1",
+    "href": "Lab4/Lab4WriteUp.html#part-e-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.5 Part e",
+    "text": "2.5 Part e\nSimilar to Part c. Find the name of the Instructions section of the website and pull the HTML of the function using html_element(...) and save the results to an object called instructions.section.\nSolution\nSame process as before here.\n\n\n\nCode\n(instructions.section = html_element(recipe.item, \"#instructions\"))\n\n\n{html_node}\n&lt;section id=\"instructions\" class=\"level2\"&gt;\n[1] &lt;h2 class=\"anchored\" data-anchor-id=\"instructions\"&gt;Instructions&lt;/h2&gt;\n[2] &lt;ol type=\"1\"&gt;\\n&lt;li&gt;In a frying pan, heat 2 tablespoons olive oil with chi ...",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-f-1",
+    "href": "Lab4/Lab4WriteUp.html#part-f-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.6 Part f",
+    "text": "2.6 Part f\nNow, we want to obtain all of the enumerated items. Find the element type the individual instructions and pull all of them from instructions.section using html_elements(...) (note the added s) and save the results to an object called instructions.\nSolution\nSame process as before here.\n\n\n\nCode\n(instructions = html_elements(instructions.section, \"li\"))\n\n\n{xml_nodeset (5)}\n[1] &lt;li&gt;In a frying pan, heat 2 tablespoons olive oil with chili flakes.&lt;/li&gt;\n[2] &lt;li&gt;Add spinach and cook until wilted.&lt;/li&gt;\n[3] &lt;li&gt;Mix gochujang and mayonnaise in a small bowl and spread on one side o ...\n[4] &lt;li&gt;Build sandwiches by layering spinach, kimchi, and cheese between two  ...\n[5] &lt;li&gt;Fry in butter until golden brown on both sides.&lt;/li&gt;",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-g-1",
+    "href": "Lab4/Lab4WriteUp.html#part-g-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.7 Part g",
+    "text": "2.7 Part g\nFind the class of the recipe image and pull the HTML using html_element(...) and save the results to an object called image.element.  Hint: You can ask for elements by class using a preceeding “.”. See ?html_element(...) for a helpful example. Further, note that HTML elements may have more than one class (separated by a space). When that is the case, you need to choose one.\nSolution\nFound specifc image class and used html_element.\n\n\n\nCode\n(image.element = html_element(recipe.item, \".figure-img\"))\n\n\n{html_node}\n&lt;img src=\"images/KimchiGrilledCheese.jpg\" class=\"img-fluid figure-img\"&gt;",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-h-1",
+    "href": "Lab4/Lab4WriteUp.html#part-h-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.8 Part h",
+    "text": "2.8 Part h\nUse the html_attr(...) function to pull the source link (“src”). Then, use paste(...) to prepend the source link with “website/” so we have the full link. Note: This would be like adding “https://www.website.com” to get the absolute link.\nSolution\nUsed paste to combine “website/” and the source link. Had to make sure there is no space between the two elements in paste.\n\n\n\nCode\n(image.url = paste(\"website/\",html_attr(image.element, \"src\"), sep=\"\"))\n\n\n[1] \"website/images/KimchiGrilledCheese.jpg\"",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#part-i-1",
+    "href": "Lab4/Lab4WriteUp.html#part-i-1",
+    "title": "Lab Four – Programming in R",
+    "section": "2.9 Part i",
+    "text": "2.9 Part i\nNow that we have all the things we need, let’s try to print the recipe. Below, I have written code to print from the objects. One by one, remove #| eval: false from the YAML header and add #| echo: false and #| results: 'asis', and test. Let me know if you’re stuck!\nSolution\nFollowed above instructions, had no issues here.\nImage\n\n\n\nKimchi Grilled Cheese\n\n\n\n\nIngredients\n\n\n1/8 tsp chili flakes\n4 garlic cloves\n5 oz spinach\n1 tsp gochujang\n3 tsp mayonnaise\n2/3 cup kimchi\n4 slices of bread\n2/3 cup cheddar cheese\n4 tablespoons everything seasoning.\n\n\nInstructions\n\n\nIn a frying pan, heat 2 tablespoons olive oil with chili flakes.\nAdd spinach and cook until wilted.\nMix gochujang and mayonnaise in a small bowl and spread on one side of each slice of bread. Sprinkle with everything seasoning and press it into the bread.\nBuild sandwiches by layering spinach, kimchi, and cheese between two slices of bread.\nFry in butter until golden brown on both sides.",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#why-a-fake-website",
+    "href": "Lab4/Lab4WriteUp.html#why-a-fake-website",
+    "title": "Lab Four – Programming in R",
+    "section": "4.1 Why a fake website?",
+    "text": "4.1 Why a fake website?\nRead https://www.scrapingbee.com/blog/is-web-scraping-legal/. Originally, I conceived doing this with recipes from Purple Carrot (my favorite subscription service). Being a large company, their terms of service are very long and precluded us from copying their recipes. We also checked a few smaller recipe websites we like and even they had terms of service that restricted automated collection of data.",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#conditionals",
+    "href": "Lab4/Lab4WriteUp.html#conditionals",
+    "title": "Lab Four – Programming in R",
+    "section": "4.2 Conditionals",
+    "text": "4.2 Conditionals\nDid you use conditional statements in your code? If yes, how. If not, are there places you could have used them but did something else?\nSolution\nI’m assuming all of these questions are in context to the code I wrote in Menu.qmd.\nI didn’t use conditionals in my code. Looking back I also don’t think there are any places for me to use them either as I’m not comparing any instances of data.",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#loops",
+    "href": "Lab4/Lab4WriteUp.html#loops",
+    "title": "Lab Four – Programming in R",
+    "section": "4.3 Loops",
+    "text": "4.3 Loops\nDid you use loops in your code? If yes, how. If not, are there places you could have used them but did something else?\nSolution\nI did use loops in my code. I used a loop to go through each recipe and grab all the ingredients so I could combine them into one grocery list. I liked this solution because if I wanted to scale up the number of recipes, it can easily handle that. I used lapply to apply my scrape html function on each recipe in a vector, so in that case it looped through the vector.",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "Lab4/Lab4WriteUp.html#functions",
+    "href": "Lab4/Lab4WriteUp.html#functions",
+    "title": "Lab Four – Programming in R",
+    "section": "4.4 Functions",
+    "text": "4.4 Functions\nDid you use functions in your code? If yes, how. If not, are there places you could have used them but did something else?\nSolution\nI tried to use functions as much as possible to cut out repeatble work. I had a scrape html function that would grab all the necessary html info given the recipe. That way, it cut out me having to repeatedly get the html four different times. I also had a print function that would nicely print out the ingredients and instructions and image in the correct format. Doing that allowed me to just call the function four times for each recipe.",
+    "crumbs": [
+      "Lab Four -- Programming in R"
+    ]
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site. Hee hee hee haw grrr",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Portfolio",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "Lab11/Lab11WriteUp.html",
+    "href": "Lab11/Lab11WriteUp.html",
+    "title": "Lab Eleven – Point Estimation and Resampling",
+    "section": "",
+    "text": "Tips",
+    "crumbs": [
+      "Lab Eleven -- Point Estimation and Resampling"
+    ]
+  },
+  {
+    "objectID": "Lab11/Lab11WriteUp.html#initial-simulation",
+    "href": "Lab11/Lab11WriteUp.html#initial-simulation",
+    "title": "Lab Eleven – Point Estimation and Resampling",
+    "section": "2.1 Initial Simulation",
+    "text": "2.1 Initial Simulation\nIn this lab, we will explore why we use \\(S_{n-1}^2\\) and not \\(S_n^2\\). To do this, we will generate data from four known distributions:\n\nPoisson\\((\\lambda=2)\\)\nBinomial\\(\\left(n=50, p=\\frac{5-\\sqrt{21}}{10}\\right)\\)\nNormal\\((\\mu=0, \\sigma=\\sqrt{2})\\)\nExponential\\(\\left(\\lambda = \\frac{1}{\\sqrt{2}}\\right).\\)\n\nRemark: Note that I have selected the parameters so that the true variance for all four models is 2.\nFor each distribution, write a loop that completes the following 1000 times. Put set.seed(7272) at the top of your code chunk.\n\nGenerate a sample of size \\(n\\) from the distribution.\nCalculate and save \\(S_{n-1}^2\\) and \\(S_n^2.\\)\n\nStart with \\(n=20\\). Is there evidence that \\(S_{n-1}^2\\) is a better estimator than \\(S_n^2\\)?\nCreate a plot or combination of plots (using patchwork) to show the results across all four distributions. Make sure to create a corresponding table that numerically summarizes the results of the simulation. You should include \\[\\begin{align*}\n\\textrm{Bias} &= \\textrm{Average of Estimates} - \\textrm{True Value}\\\\\n\\textrm{Precision} &= \\frac{1}{\\textrm{Variance of Estimates}}\\\\\n\\textrm{Mean Square Error} &= \\textrm{Bias}^2 + \\textrm{Variance of Estimates}.\n\\end{align*}\\]\nSolution\n\n\n\nCode\nset.seed(7272)\n\n#numbers\nn = 20 \ntrue_val = 2\n\npois_n = rep(NA, 1000)\npois_n1 = rep(NA, 1000)\n\nfor (i in 1:1000){\n  x_pois = rpois(n, 2)\n  pois_n1[i] = var(x_pois)\n  pois_n[i] = (n-1)/n * var(x_pois)\n}\n\nbinom_n = rep(NA, 1000)\nbinom_n1 = rep(NA, 1000)\n\nfor (i in 1:1000){\n  x_binom = rbinom(n, size = 50, prob = (5-sqrt(21))/10)\n  binom_n1[i] = var(x_binom)\n  binom_n[i] = (n-1)/n * var(x_binom)\n}\n\nnorm_n = rep(NA, 1000)\nnorm_n1 = rep(NA, 1000)\n\nfor (i in 1:1000){\n  x_norm = rnorm(n, mean = 0, sd = sqrt(2))\n  norm_n1[i] = var(x_norm)\n  norm_n[i] = (n-1)/n * var(x_norm)\n}\n\nexpo_n = rep(NA, 1000)\nexpo_n1 = rep(NA, 1000)\n\nfor (i in 1:1000){\n  x_expo = rexp(n, rate = sqrt(1/2)) #dis is the same as 1/sqrt(2) but im cool like that\n  expo_n1[i] = var(x_expo)\n  expo_n[i] = (n-1)/n * var(x_expo)\n}\n\nresults = bind_rows(\n  tibble(distribution =\"Poisson\", estimator =\"S2_n-1\", estimate =pois_n1),\n  tibble(distribution =\"Poisson\", estimator =\"S2_n\", estimate =pois_n),\n  tibble(distribution =\"Binomial\", estimator =\"S2_n-1\", estimate =binom_n1),\n  tibble(distribution =\"Binomial\", estimator =\"S2_n\", estimate =binom_n),\n  tibble(distribution =\"Normal\", estimator =\"S2_n-1\", estimate =norm_n1),\n  tibble(distribution =\"Normal\", estimator =\"S2_n\", estimate =norm_n),\n  tibble(distribution =\"Exponential\", estimator =\"S2_n-1\", estimate =expo_n1),\n  tibble(distribution =\"Exponential\", estimator =\"S2_n\", estimate =expo_n)\n)\n\nggplot(results, aes(x =estimator, y =estimate)) +\n  geom_boxplot() +\n  facet_wrap(~distribution, scales = \"free\")+\n  geom_hline(yintercept=true_val)+\n  xlab(\"Estimator\") + \n  ylab(\"Estimated Variance\")+\n  theme_bw()\n\n\n\n\nVariance Estimators by Distribution\n\n\n\n\n\nCode\nsummary_table = results |&gt;\n  group_by(distribution, estimator) |&gt;\n  summarize(\n    bias = mean(estimate) - true_val,\n    precision = 1/(var(estimate)),\n    mse = bias^2 + var(estimate),\n    average_estimate = mean(estimate), #added these bc relevant to simulations\n    variance_of_estimates = var(estimate),\n  )\n\n\n\n\n\n\nCode\nknitr::kable(summary_table, digits = 4)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ndistribution\nestimator\nbias\nprecision\nmse\naverage_estimate\nvariance_of_estimates\n\n\n\n\nBinomial\nS2_n\n-0.1336\n2.3821\n0.4376\n1.8664\n0.4198\n\n\nBinomial\nS2_n-1\n-0.0354\n2.1498\n0.4664\n1.9646\n0.4652\n\n\nExponential\nS2_n\n-0.1150\n0.7746\n1.3042\n1.8850\n1.2910\n\n\nExponential\nS2_n-1\n-0.0158\n0.6991\n1.4307\n1.9842\n1.4305\n\n\nNormal\nS2_n\n-0.0978\n2.2480\n0.4544\n1.9022\n0.4448\n\n\nNormal\nS2_n-1\n0.0023\n2.0289\n0.4929\n2.0023\n0.4929\n\n\nPoisson\nS2_n\n-0.1153\n2.3283\n0.4428\n1.8847\n0.4295\n\n\nPoisson\nS2_n-1\n-0.0161\n2.1013\n0.4762\n1.9839\n0.4759\n\n\n\n\n\n\nBased on our above figure, we can see that for most distributions \\(S^2_{n-1}\\) is generally closer to the true variance value compared to the other estimator, \\(S^2_n\\). We can generally keep an eye on this as evidence for our best estimator as of yet.",
+    "crumbs": [
+      "Lab Eleven -- Point Estimation and Resampling"
+    ]
+  },
+  {
+    "objectID": "Lab11/Lab11WriteUp.html#simulation-over-various-sample-sizes",
+    "href": "Lab11/Lab11WriteUp.html#simulation-over-various-sample-sizes",
+    "title": "Lab Eleven – Point Estimation and Resampling",
+    "section": "2.2 Simulation over various sample sizes",
+    "text": "2.2 Simulation over various sample sizes\nConsider the effect of the sample size have on these results. Provide a graphical and numerical summary of what happens as \\(n\\) increases – say \\(n=20\\), \\(n=50\\), \\(n=100\\), and \\(n=500\\). Does the result in your initial simulation hold across samples? Or, do things change as the sample size changes? Ensure to set your randomization seed.\nSolution\n\n\n\nCode\nset.seed(7272)\n\nsimulate_by_size = function(n){\n\n  pois_n = rep(NA, 1000)\n  pois_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    x_pois = rpois(n, 2)\n    pois_n1[i] = var(x_pois)\n    pois_n[i] = (n-1)/n * var(x_pois)\n  }\n\n  binom_n = rep(NA, 1000)\n  binom_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    x_binom = rbinom(n, size = 50, prob = (5-sqrt(21))/10)\n    binom_n1[i] = var(x_binom)\n    binom_n[i] = (n-1)/n * var(x_binom)\n  }\n\n  norm_n = rep(NA, 1000)\n  norm_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    x_norm = rnorm(n, mean = 0, sd = sqrt(2))\n    norm_n1[i] = var(x_norm)\n    norm_n[i] = (n-1)/n * var(x_norm)\n  }\n\n  expo_n = rep(NA, 1000)\n  expo_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    x_expo = rexp(n, rate = sqrt(1/2)) #dis is the same as 1/sqrt(2) but im cool like that\n    expo_n1[i] = var(x_expo)\n    expo_n[i] = (n-1)/n * var(x_expo)\n  }\n\n  results = bind_rows(\n    tibble(sample_size = n,distribution =\"Poisson\", estimator =\"S2_n-1\", estimate =pois_n1),\n    tibble(sample_size = n,distribution =\"Poisson\", estimator =\"S2_n\", estimate =pois_n),\n    tibble(sample_size = n,distribution =\"Binomial\", estimator =\"S2_n-1\", estimate =binom_n1),\n    tibble(sample_size = n,distribution =\"Binomial\", estimator =\"S2_n\", estimate =binom_n),\n    tibble(sample_size = n,distribution =\"Normal\", estimator =\"S2_n-1\", estimate =norm_n1),\n    tibble(sample_size = n,distribution =\"Normal\", estimator =\"S2_n\", estimate =norm_n),\n    tibble(sample_size = n,distribution =\"Exponential\", estimator =\"S2_n-1\", estimate =expo_n1),\n    tibble(sample_size = n,distribution =\"Exponential\", estimator =\"S2_n\", estimate =expo_n)\n  )\n  return(results)\n}\n\nall_results = bind_rows(\n  simulate_by_size(20),\n  simulate_by_size(50),\n  simulate_by_size(100),\n  simulate_by_size(500)\n)\n\nsummary_table = all_results |&gt;\n  group_by(sample_size, distribution, estimator) |&gt;\n  summarize(\n    bias = mean(estimate) - true_val,\n    precision = 1 / var(estimate),\n    mse = bias^2 + var(estimate),\n    average_estimate = mean(estimate),\n    variance_of_estimates = var(estimate)\n  )\n\nknitr::kable(summary_table, digits = 4)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nsample_size\ndistribution\nestimator\nbias\nprecision\nmse\naverage_estimate\nvariance_of_estimates\n\n\n\n\n20\nBinomial\nS2_n\n-0.1336\n2.3821\n0.4376\n1.8664\n0.4198\n\n\n20\nBinomial\nS2_n-1\n-0.0354\n2.1498\n0.4664\n1.9646\n0.4652\n\n\n20\nExponential\nS2_n\n-0.1150\n0.7746\n1.3042\n1.8850\n1.2910\n\n\n20\nExponential\nS2_n-1\n-0.0158\n0.6991\n1.4307\n1.9842\n1.4305\n\n\n20\nNormal\nS2_n\n-0.0978\n2.2480\n0.4544\n1.9022\n0.4448\n\n\n20\nNormal\nS2_n-1\n0.0023\n2.0289\n0.4929\n2.0023\n0.4929\n\n\n20\nPoisson\nS2_n\n-0.1153\n2.3283\n0.4428\n1.8847\n0.4295\n\n\n20\nPoisson\nS2_n-1\n-0.0161\n2.1013\n0.4762\n1.9839\n0.4759\n\n\n50\nBinomial\nS2_n\n-0.0374\n5.2558\n0.1917\n1.9626\n0.1903\n\n\n50\nBinomial\nS2_n-1\n0.0026\n5.0477\n0.1981\n2.0026\n0.1981\n\n\n50\nExponential\nS2_n\n0.0087\n1.4557\n0.6870\n2.0087\n0.6869\n\n\n50\nExponential\nS2_n-1\n0.0497\n1.3981\n0.7177\n2.0497\n0.7153\n\n\n50\nNormal\nS2_n\n-0.0304\n6.2500\n0.1609\n1.9696\n0.1600\n\n\n50\nNormal\nS2_n-1\n0.0098\n6.0025\n0.1667\n2.0098\n0.1666\n\n\n50\nPoisson\nS2_n\n-0.0293\n4.6500\n0.2159\n1.9707\n0.2151\n\n\n50\nPoisson\nS2_n-1\n0.0109\n4.4659\n0.2240\n2.0109\n0.2239\n\n\n100\nBinomial\nS2_n\n-0.0476\n10.9444\n0.0936\n1.9524\n0.0914\n\n\n100\nBinomial\nS2_n-1\n-0.0279\n10.7266\n0.0940\n1.9721\n0.0932\n\n\n100\nExponential\nS2_n\n0.0076\n2.9136\n0.3433\n2.0076\n0.3432\n\n\n100\nExponential\nS2_n-1\n0.0278\n2.8556\n0.3510\n2.0278\n0.3502\n\n\n100\nNormal\nS2_n\n-0.0045\n12.4465\n0.0804\n1.9955\n0.0803\n\n\n100\nNormal\nS2_n-1\n0.0157\n12.1988\n0.0822\n2.0157\n0.0820\n\n\n100\nPoisson\nS2_n\n-0.0110\n10.1671\n0.0985\n1.9890\n0.0984\n\n\n100\nPoisson\nS2_n-1\n0.0091\n9.9648\n0.1004\n2.0091\n0.1004\n\n\n500\nBinomial\nS2_n\n-0.0001\n54.6630\n0.0183\n1.9999\n0.0183\n\n\n500\nBinomial\nS2_n-1\n0.0039\n54.4446\n0.0184\n2.0039\n0.0184\n\n\n500\nExponential\nS2_n\n-0.0042\n15.5185\n0.0645\n1.9958\n0.0644\n\n\n500\nExponential\nS2_n-1\n-0.0002\n15.4565\n0.0647\n1.9998\n0.0647\n\n\n500\nNormal\nS2_n\n0.0005\n58.6278\n0.0171\n2.0005\n0.0171\n\n\n500\nNormal\nS2_n-1\n0.0045\n58.3935\n0.0171\n2.0045\n0.0171\n\n\n500\nPoisson\nS2_n\n-0.0025\n54.1056\n0.0185\n1.9975\n0.0185\n\n\n500\nPoisson\nS2_n-1\n0.0015\n53.8894\n0.0186\n2.0015\n0.0186\n\n\n\n\n\n\n\n\n\nCode\nbias_plot = ggplot(summary_table,\n                 aes(x = sample_size, y = bias, color = estimator)) +\n  geom_line() +\n  geom_point() +\n  facet_wrap(~distribution) +\n  xlab(\"Sample Size\") + \n  ylab(\"Bias\")+\n  geom_hline(yintercept=0)+\n  scale_x_continuous(breaks = c(20, 50, 100, 500)) +\n  theme_bw()+\n  theme( #had to look this up so it wasnt in the way and the x intercept was visible\n    legend.position = \"bottom\",\n    axis.text.x = element_text(angle = 55, hjust = 1)\n  )\n\nprecision_plot = ggplot(summary_table,\n                      aes(x = sample_size, y = precision, color = estimator)) +\n  geom_line() +\n  geom_point() +\n  facet_wrap(~distribution) +\n  xlab(\"Sample Size\")+\n  ylab(\"Precision\")+\n  scale_x_continuous(breaks = c(20, 50, 100, 500)) +\n  theme_bw() + \n  theme(\n    legend.position = \"bottom\",\n    axis.text.x = element_text(angle = 55, hjust = 1)\n  )\n\nbias_plot | precision_plot\n\n\n\n\nSample Size vs Bias and Precision\n\n\n\n\n\n\nLooking first at our precision graphs, we see that both estimators evolve almost exactly the same when scaling with sample size, even having extremely similar values themselves for our precicion measurement. Thus, we disregard the precision graph and use the bias graph to make a proper distinction between each estimator. We see that generally \\(S^2_{n-1}\\) has lower bias compared to \\(S^2_n\\) at every low sample size, thus we can say that it is a better estimator at low sample sizes. At large sample sizes, both estimators seem to converge very close to 0 bias, thus using either estimator at large sample sizes may not actually matter much.",
+    "crumbs": [
+      "Lab Eleven -- Point Estimation and Resampling"
+    ]
+  },
+  {
+    "objectID": "Lab11/Lab11WriteUp.html#simulation",
+    "href": "Lab11/Lab11WriteUp.html#simulation",
+    "title": "Lab Eleven – Point Estimation and Resampling",
+    "section": "2.3 Simulation",
+    "text": "2.3 Simulation\nYou have written code to draw a random sample of various sizes from each distribution, and to calculate and store the calculated estimates. Rework your code to produce a density plot of the \\(s_{n-1}^2\\) and \\(s_{n}^2\\). Do you have a guess about their distribution? Ensure to set your randomization seed.\nSolution\n\n\n\nCode\nset.seed(7272)\n\nggplot(all_results, aes(x = estimate, fill = estimator)) +\n  geom_density(alpha = 0.4) +\n  facet_grid(sample_size~distribution, scales = \"free\") + #goated oscar refine\n  geom_vline(xintercept = true_val, linetype = \"dashed\") +\n  xlab(\"Estimated Variance\") +\n  ylab(\"Density\") +\n  theme_bw() +\n  theme(\n    legend.position = \"bottom\"\n  )\n\n\n\n\nDensity Plots of Variance Estimators with Varying Sample Sizes\n\n\n\n\n\n\nHere, we see that at lower values of n, \\(S^2_{n-1}\\) is more centered around the true variance value. We also see the at higher n values, both estimators share the same shape and are pretty gaussian distributed around the true value. I could have guessed that at lower n values, the density plot was going to share similarities with a chi squared plot as we are sampling on variance, which implies a chi squared distribution with right skewness. This is exactly what we see here.",
+    "crumbs": [
+      "Lab Eleven -- Point Estimation and Resampling"
+    ]
+  },
+  {
+    "objectID": "Lab11/Lab11WriteUp.html#bootstrap",
+    "href": "Lab11/Lab11WriteUp.html#bootstrap",
+    "title": "Lab Eleven – Point Estimation and Resampling",
+    "section": "2.4 Bootstrap",
+    "text": "2.4 Bootstrap\nNow, take one sample from each distribution. Instead of drawing a random sample at each iteration, sample with replacement from the one sample. Produce a density plot of the \\(s_{n-1}^2\\) and \\(s_{n}^2\\). Do we get roughly the same information as we do in the full simulation? Try this over several seeds – what do you notice? Ensure to set your randomization seed.\nSolution\n\n\n\nCode\nset.seed(7272)\n\nboot_by_size = function(n){\n\n#distributions\n  x_pois = rpois(n, 2)\n  x_binom = rbinom(n, size = 50, prob = (5-sqrt(21))/10)\n  x_norm = rnorm(n, mean = 0, sd = sqrt(2))\n  x_expo = rexp(n, rate = sqrt(1/2))\n\n#storage\n  pois_n = rep(NA, 1000)\n  pois_n1 = rep(NA, 1000)\n\n#booting here\n  for (i in 1:1000){\n    boot_pois = sample(x_pois, size = n, replace = TRUE)\n    pois_n1[i] = var(boot_pois)\n    pois_n[i] = (n-1)/n * var(boot_pois)\n  }\n\n#rinse repeat for each distr\n  binom_n = rep(NA, 1000)\n  binom_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    boot_binom = sample(x_binom, size = n, replace = TRUE)\n    binom_n1[i] = var(boot_binom)\n    binom_n[i] = (n-1)/n * var(boot_binom)\n  }\n\n  norm_n = rep(NA, 1000)\n  norm_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    boot_norm = sample(x_norm, size = n, replace = TRUE)\n    norm_n1[i] = var(boot_norm)\n    norm_n[i] = (n-1)/n * var(boot_norm)\n  }\n\n  expo_n = rep(NA, 1000)\n  expo_n1 = rep(NA, 1000)\n\n  for (i in 1:1000){\n    boot_expo = sample(x_expo, size = n, replace = TRUE)\n    expo_n1[i] = var(boot_expo)\n    expo_n[i] = (n-1)/n * var(boot_expo)\n  }\n\n  results = bind_rows(\n    tibble(sample_size = n, distribution = \"Poisson\", estimator = \"S2_n-1\", estimate = pois_n1),\n    tibble(sample_size = n, distribution = \"Poisson\", estimator = \"S2_n\", estimate = pois_n),\n    tibble(sample_size = n, distribution = \"Binomial\", estimator = \"S2_n-1\", estimate = binom_n1),\n    tibble(sample_size = n, distribution = \"Binomial\", estimator = \"S2_n\", estimate = binom_n),\n    tibble(sample_size = n, distribution = \"Normal\", estimator = \"S2_n-1\", estimate = norm_n1),\n    tibble(sample_size = n, distribution = \"Normal\", estimator = \"S2_n\", estimate = norm_n),\n    tibble(sample_size = n, distribution = \"Exponential\", estimator = \"S2_n-1\", estimate = expo_n1),\n    tibble(sample_size = n, distribution = \"Exponential\", estimator = \"S2_n\", estimate = expo_n)\n  )\n\n  return(results)\n}\n\nbootstrap_results = bind_rows(\n  boot_by_size(20),\n  boot_by_size(50),\n  boot_by_size(100),\n  boot_by_size(500)\n)\n\n\n\n\n\n\nCode\nggplot(bootstrap_results, aes(x = estimate, fill = estimator)) +\n  geom_density(alpha = 0.4) +\n  facet_grid(sample_size ~ distribution, scales = \"free\") +\n  geom_vline(xintercept = true_val, linetype = \"dashed\") +\n  xlab(\"Estimated Variance\") +\n  ylab(\"Density\") +\n  theme_bw() +\n  theme(\n    legend.position = \"bottom\"\n  )\n\n\n\n\nBootstrap Density Plots of Variance Estimators by Sample Size (Seed: 7272)\n\n\n\n\n\n\n\n\n\nCode\nset.seed(5055)\n\nbootstrap_results = bind_rows(\n  boot_by_size(20),\n  boot_by_size(50),\n  boot_by_size(100),\n  boot_by_size(500)\n)\n\n\n\n\n\n\nCode\nggplot(bootstrap_results, aes(x = estimate, fill = estimator)) +\n  geom_density(alpha = 0.4) +\n  facet_grid(sample_size ~ distribution, scales = \"free\") +\n  geom_vline(xintercept = true_val, linetype = \"dashed\") +\n  xlab(\"Estimated Variance\") +\n  ylab(\"Density\") +\n  theme_bw() +\n  theme(\n    legend.position = \"bottom\"\n  )\n\n\n\n\nBootstrap Density Plots of Variance Estimators by Sample Size (Seed: 5055)\n\n\n\n\n\n\nBecause we are resampling with replacement, we are going to get a slightly different sample distribution, easily shown in the diffrent graphs of figure 3 and 4. Our bootstrap gives generally the same idea as in our full simulation. In both ideas, in almost all trials, the \\(S^2_{n-1}\\) is centered more around the true value compared to \\(S^2_n\\). In fact, \\(S^2_n\\) seems to consistently be left shifted, showing how it has a decrease bias. Once again, we see that both distributions become more tightly and better centered around the true value as our sample size increases.\nHowever, we do see results vary from seed to seed. This is because our bootstrap resampling does not resample from the true population but instead samples with replacement from the original sample. That original sample is dependent on our seed, thus we will see distinctions between seeds. Overall however, the same qualititative behavior exists between seeds so our analysis is stil valid.",
+    "crumbs": [
+      "Lab Eleven -- Point Estimation and Resampling"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html",
+    "href": "Lab8/Lab8WriteUp.html",
+    "title": "Lab Eight – Probability",
+    "section": "",
+    "text": "Tips",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#the-binomial-distribution",
+    "href": "Lab8/Lab8WriteUp.html#the-binomial-distribution",
+    "title": "Lab Eight – Probability",
+    "section": "1.1 The Binomial Distribution",
+    "text": "1.1 The Binomial Distribution\nIn many introductory courses, we make the simplifying assumption of independence in Bernoulli trials. For example, when playing best two-out-of-three legs in a darts match, we would assume Player A has an 70% chance of winning each leg. We write: \\[X \\sim \\text{Binomial}(n=3, p=0.70)\\] where\n\n\\(X\\) is the number of legs won\n\\(n\\) is the number of trials\n\\(p\\) is the probability of the event of interest\n\nOf note, it is not necessarily the case that the players play all three legs – if either player wins legs one and two the match ends.\nThere are eight possible outcomes for Player A:\n\n(win, win, “win”) \\(\\longrightarrow\\) Player A wins\n(win, win, “lose”) \\(\\longrightarrow\\) Player A wins\n(win, lose, win) \\(\\longrightarrow\\) Player A wins\n(win, lose, lose) \\(\\longrightarrow\\) Player A loses\n(lose, win, win) \\(\\longrightarrow\\) Player A wins\n(lose, win, lose) \\(\\longrightarrow\\) Player A loses\n(lose, lose, “win”) \\(\\longrightarrow\\) Player A loses\n(lose, lose, “lose”) \\(\\longrightarrow\\) Player A loses\n\nNote: I use quotations above to denote outcomes where the last match isn’t actually played.\nUse the Binomial distribution to compute the probability that Player A wins the match. Make sure write out your probability statement and work to write it in terms of the distribution function (PMF/CDF) to plot the probability using ggplot.\nSolution\nHere, I am looking for \\(P(X\\geq2)\\), the probability that player A wins at least two matches. I can do \\[\\begin{align*}\nP(X \\geq 2) &= 1 - P(X&lt;2)\\\\\n&= 1 - P(X\\leq1)\\\\\n&= 1 - F_X(1)\\\\\n\\end{align*}\\]\nThus, I can use the CDF function (pbinom) to easily calculate this probability. I’ve also plotted both CDF and PMF below, highlighting the probability we were calculating for.\n\n\n\nCode\nwin_percent = 1 - pbinom(q=1, prob = 0.7, size = 3)\n(win_percent)\n\n\n[1] 0.784\n\n\nCode\nggdat = tibble(x = 0:3) |&gt;\n  mutate(PMF = dbinom(x=x, prob=0.7, size = 3),\n        CDF = pbinom(q=x, prob = 0.7, size = 3))\n\nPMF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                aes(x = x, ymin = 0, ymax = PMF)) +\n  geom_linerange(data = ggdat |&gt; filter(x&gt;=2),\n                aes(x = x, ymin = 0, ymax = PMF),\n                color = \"darkorchid2\", linewidth=2, alpha=0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks=0:4) +\n  ylab(\"Probability\") +\n  theme_bw()\n\nCDF.plot = ggplot() +\n  geom_step(data=ggdat, aes(x = x, y = CDF)) +\n  geom_point(data=ggdat |&gt; filter(x==1), \n            aes(x = x, y = CDF),\n            color=\"darkorchid2\", size = 2.5, alpha =0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks=0:4) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw()\n\nPMF.plot | CDF.plot",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#the-negative-binomial-distribution",
+    "href": "Lab8/Lab8WriteUp.html#the-negative-binomial-distribution",
+    "title": "Lab Eight – Probability",
+    "section": "1.2 The Negative Binomial Distribution",
+    "text": "1.2 The Negative Binomial Distribution\nIn intermediate courses, we learn the Negative Binomial distribution that we use to model the number of “failures” until the \\(r\\)th success. Note that this approach still makes the simplifying assumption of independence in Bernoulli trials.\nSpecify the two cases necessary to compute the probability. Fully explain these probability statements in the context of a best two-out-of-three match and the Negative Binomial distribution. Finally, compute the probability that Player A wins the match and show you get the same result as the Binomial approach. Make sure write out your probability statement and work to write it in terms of the distribution function (PMF/CDF) to plot the probability using ggplot.\nSolution\nThere are two cases for the two out of three match. The first case is player A wins the first two matches in a row, and technically wins immediately. The second case is player A has exactly one loss before their two wins in order to win the whole game. Therefore, let X be the number of failures before Player A gets two wins. So, the probability that player A wins, where X follows a negative binomial distribution, is \\(P(X\\leq1)\\).\n\\[P(X \\leq 1) = F_X(1)\\]\nI get the same result as I did for the binomial distribution.\n\n\n\nCode\nwin_percent = pnbinom(q=1, prob=0.7, size = 2)\n(win_percent)\n\n\n[1] 0.784\n\n\nCode\nggdat = tibble(x = 0:5) |&gt;\n  mutate(PMF = dnbinom(x=x, prob=0.7, size = 2),\n        CDF = pnbinom(q=x, prob = 0.7, size = 2))\n\nPMF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                aes(x = x, ymin = 0, ymax = PMF)) +\n  geom_linerange(data = ggdat |&gt; filter(x&lt;=1),\n                aes(x = x, ymin = 0, ymax = PMF),\n                color = \"darkorchid2\", linewidth=2, alpha=0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"Number of Failures (x)\", breaks=0:5) +\n  ylab(\"Probability\") +\n  theme_bw()\n\nCDF.plot = ggplot() +\n  geom_step(data=ggdat, aes(x = x, y = CDF)) +\n  geom_point(data=ggdat |&gt; filter(x==1), \n            aes(x = x, y = CDF),\n            color=\"darkorchid2\", size = 2.5, alpha =0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"Number of Failures (x)\", breaks=0:5) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw()\n\nPMF.plot | CDF.plot",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#the-beta-part",
+    "href": "Lab8/Lab8WriteUp.html#the-beta-part",
+    "title": "Lab Eight – Probability",
+    "section": "2.1 The Beta Part",
+    "text": "2.1 The Beta Part\n\nPlot the corresponding Beta distribution. Interpret the plot in the context of a best two-out-of-three match and the Binomial distribution.\nHint: The Beta distribution is available in base R via _beta().\n\nSolution\nThe distribution models the uncertainty of Player A’s leg-win probability. Instead of it being a fixed value at 0.7, the distribution is centered around 0.7 with some variance such that the leg-win probability could be slightly above or below that.\n\n\n\nCode\nggdat = tibble(x = seq(0, 1, length.out=1000)) |&gt;\n  mutate(PDF = dbeta(x = x, 7, 3),\n        CDF = pbeta(q = x, 7, 3))\n\nPDF.plot = ggplot(ggdat) +\n  geom_line(aes(x = x, y = PDF)) +\n  geom_hline(yintercept = 0) +\n  xlab(\"x\") +\n  ylab(\"Density\") +\n  theme_bw()\n\nCDF.plot = ggplot(ggdat) +\n  geom_line(aes(x = x, y = CDF)) +\n  geom_hline(yintercept = 0) +\n  xlab(\"x\") +\n  ylab(\"Cumulative Probability\") +\n  theme_bw()\n\nPDF.plot | CDF.plot\n\n\n\n\nBeta Distribution\n\n\n\n\n\n\n\nHow does the Beta incorporate uncertainty about the skill of Player A? Compute the mean and variance of the distribution.\nHint: You will find the integrate(...) function helpful here. \\[\\begin{align*}\n  E(P) &= \\mu_P = \\int_{0}^1 p f_P(p) dp\\\\\n  var(P) &= \\sigma^2_P = \\int_{0}^1 (p-\\mu_P)^2 f_P(p) dp\\\\\n\\end{align*}\\]\n\nSolution\nThe Beta incorporates uncertianty through the variance of the distribution which slightly varies the skill of Player A. I make separate functions for each mean and variance, and then I integrate each from 0 to 1. I had an issue here because I didn’t realize the integrate function returns characters so I had to specify my value using value.\n\n\n\nCode\n#mean\nf_mean = function(p){\n  p * dbeta(p, 7, 3)\n}\n#beta mean\nbeta_mean = integrate(f_mean, lower = 0, upper = 1)\n(beta_mean)\n\n\n0.7 with absolute error &lt; 7.8e-15\n\n\nCode\n#var\nf_var = function(p){\n  dbeta(p,7,3) * (p-beta_mean$value)^2\n}\n#beta var\nbeta_var = integrate(f_var, lower = 0, upper = 1)\n(beta_var)\n\n\n0.01909091 with absolute error &lt; 2.1e-16\n\n\n\n\nWhat is the probability that Player A has a win probability of exactly 0.70? Make sure to write out your probability statement and work to write it in terms of the distribution function (PDF/CDF) to plot the probability using ggplot.\nHint: Think carefully about the properties of continuous distributions here.\n\nSolution\nBecause X is a continuous random variable on a Beta distribution, the probability of any exact single value is 0. Density is not the same thing as probability here.\n\nWhat is the probability that Player A has a win probability of at least 0.50? Make sure write out your probability statement and work to write it in terms of the distribution function (PDF/CDF) to plot the probability using ggplot.\n\nSolution\n\\[P(X\\geq0.5) = 1-P(X\\leq0.5) = 1-F_X(0.5)\\]\nI use a standard probability statement to find I just need to use the CDF function to find this probability. I shade the region on the density graph and mark the point on the CDF plot.\n\n\n\nCode\n#atleast 50 win prob\nprob_0.5 = 1 - pbeta(q = 0.5, shape1 = 7, shape2 = 3)\nprob_0.5\n\n\n[1] 0.9101562\n\n\nCode\nggdat = tibble(x = seq(0, 1, length.out = 1000)) |&gt;\n  mutate(\n    PDF = dbeta(x = x, 7, 3),\n    CDF = pbeta(q = x, 7, 3)\n  )\n\nPDF.plot = ggplot() +\n  geom_linerange(data=ggdat,aes(x = x, ymin = 0, ymax = PDF), \n                  alpha = 0.3) +\n  geom_linerange(data=ggdat |&gt; filter(x &gt;=0.5),\n                aes(x = x, ymin = 0, ymax = PDF),\n                color = \"darkorchid2\", linewidth=1, alpha=0.15) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks=seq(0,1,by=0.2)) +\n  ylab(\"Density\") +\n  theme_bw()\n\nCDF.plot = ggplot() +\n  geom_step(data = ggdat, aes(x = x, y = CDF)) +\n  geom_point(data = ggdat |&gt; filter(x==1), \n            aes(x = 0.5, y = pbeta(q=0.5,7,3)),\n            color=\"darkorchid2\", size = 2.5, alpha =0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks=seq(0,1,by=0.2)) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw()\n\nPDF.plot | CDF.plot\n\n\n\n\nAt least 50% win probability\n\n\n\n\n\n\n\nWhat is the 90th percentile of Player A’s win probability based on this Beta distribution? Make sure write out your probability statement and work to write it in terms of the distribution function (PDF/CDF) to plot the percentile using ggplot.\n\nSolution\nFor the 90th percentile I set up as:\n\\[P(X\\leq q) = 0.90 = F_X(q)\\]\nSolving for q: \\[q = F_X^{-1}(0.90)\\]\nWe can easily use the inverse CDF function for this.\n\n\n\nCode\n#90th percentile win prob\nq_90 = qbeta(p = 0.90, shape1 = 7, shape2 = 3)\nq_90\n\n\n[1] 0.8705027\n\n\nCode\nggdat = tibble(x = seq(0, 1, length.out = 1000)) |&gt;\n  mutate(\n    PDF = dbeta(x = x, 7, 3),\n    CDF = pbeta(q = x, 7, 3)\n  )\n\nPDF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                 aes(x = x, ymin = 0, ymax = PDF)) +\n  geom_linerange(data = ggdat |&gt; filter(x &lt;= q_90),\n                 aes(x = x, ymin = 0, ymax = PDF),\n                 color = \"darkorchid2\", linewidth = 1, alpha = 0.15) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = seq(0, 1, by = 0.2)) +\n  ylab(\"Density\") +\n  theme_bw()\n\nCDF.plot = ggplot() +\n  geom_step(data = ggdat, aes(x = x, y = CDF)) +\n  geom_point(aes(x = q_90, y = 0.90),\n             color = \"darkorchid2\", size = 2.5, alpha = 0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = seq(0, 1, by = 0.2)) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw()\n\nPDF.plot | CDF.plot\n\n\n\n\n90th percent",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#the-beta-binomial-part",
+    "href": "Lab8/Lab8WriteUp.html#the-beta-binomial-part",
+    "title": "Lab Eight – Probability",
+    "section": "2.2 The Beta-Binomial Part",
+    "text": "2.2 The Beta-Binomial Part\nCompute the probability that Player A wins the match. Compare your result to the Binomial and Negative Binomial results. Make sure write out your probability statement and work to write it in terms of the distribution function (PMF/CDF) to plot the probability using ggplot\nSolution\nFor X being the number of legs won by Player A in the game, under the beta-binomial model, X follows the beta-bionomial distribution. Player A wins if they win at least 2 out of the 3 legs. Thus,\n\\[P(X\\geq 2) = 1 - P(X\\leq 1) = 1 - F_X(1)\\]\nThis is similar to the binomial model, but now our leg winning probability varies slightly accoridng to the beta distribution.\n\n\n\nCode\n#our varying win prob\nwin = 1 - pbbinom(q = 1, size = 3, alpha = 7, beta = 3)\nwin\n\n\n[1] 0.7636364\n\n\nCode\nggdat = tibble(x = 0:3) |&gt;\n  mutate(\n    PMF = dbbinom(x = x, size = 3, alpha = 7, beta = 3),\n    CDF = pbbinom(q = x, size = 3, alpha = 7, beta = 3)\n  )\n\nPMF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                 aes(x = x, ymin = 0, ymax = PMF)) +\n  geom_linerange(data = ggdat |&gt; filter(x &gt;= 2),\n                 aes(x = x, ymin = 0, ymax = PMF),\n                 color = \"darkorchid2\", linewidth = 2, alpha = 0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Probability\") +\n  theme_bw()\n\nCDF.plot = ggplot() +\n  geom_step(data = ggdat, aes(x = x, y = CDF)) +\n  geom_point(data = ggdat |&gt; filter(x == 1),\n             aes(x = x, y = CDF),\n             color = \"darkorchid2\", size = 2.5, alpha = 0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw()\n\nPMF.plot | CDF.plot\n\n\n\n\nBeta-Binomial\n\n\n\n\n\n\nMy winning probability for the beta-binomial model is ~ 76% compared to the binomial and negative binomial results of ~78%. This discrepancy is most likely due to Player A’s varying win probability.",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#the-why",
+    "href": "Lab8/Lab8WriteUp.html#the-why",
+    "title": "Lab Eight – Probability",
+    "section": "2.3 The Why",
+    "text": "2.3 The Why\nCheck the expected value and variance of each distribution.\nAnalytically, we have \\[\\begin{align*}\n  E(X) &= np  &&var(X) = np(1-p) \\tag{Binomial Distribution}\\\\\n  E(X) &= n\\left(\\frac{\\alpha}{\\alpha+\\beta}\\right)  &&var(X) = \\frac{n \\alpha \\beta (\\alpha + \\beta + n)}{(\\alpha+\\beta)^2(\\alpha + \\beta + 1)} \\tag{Beta-Binomial Distribution}\n\\end{align*}\\]\nFor each distribution, compute the mean number of legs won for player A.\nHint: You can perform the sum over the finite support set here. \\[\\begin{align*}\n  E(X)   = \\mu_X    &= \\sum_{i=0}^3 i f_X(i)\\\\\n  var(X) = \\sigma^2_X &= \\sum_{i=0}^3 (i-\\mu_X)^2 f_X(i)\n\\end{align*}\\]\nSolution\n\n\n\nCode\nn = 3\np = 0.7\n\n#expected binomial value\nE_x_binom = n*p\nE_x_binom\n\n\n[1] 2.1\n\n\nCode\n#binomial var\nvar_x_binom = n* p * (1-p)\nvar_x_binom\n\n\n[1] 0.63\n\n\nCode\nalpha = 7\nbeta = 3\n\n#expected beta binom value\nE_x_betabinom = n * (alpha/(alpha+beta))\nE_x_betabinom\n\n\n[1] 2.1\n\n\nCode\n#beta binom var\nvar_x_betabinom = (n*alpha*beta*(alpha+beta+n))/((alpha+beta)^2*(alpha+beta+1))\nvar_x_betabinom\n\n\n[1] 0.7445455\n\n\nCode\nx = 0:3\n\nbinom_PMF = dbinom(x = x, size = 3, prob = 0.7)\nbetabinom_PMF = dbbinom(x = x, size = 3, alpha = 7, beta = 3)\n\n#expected\nbinom_mean = sum(x * binom_PMF)\nbinom_mean\n\n\n[1] 2.1\n\n\nCode\nbetabinom_mean = sum(x * betabinom_PMF)\nbetabinom_mean\n\n\n[1] 2.1\n\n\nCode\n#standard deviation\nbinom_std = sqrt(sum((x - binom_mean)^2 * binom_PMF))\nbinom_std\n\n\n[1] 0.7937254\n\n\nCode\nbetabinom_std = sqrt(sum((x - betabinom_mean)^2 * betabinom_PMF))\nbetabinom_std\n\n\n[1] 0.8628705\n\n\n\nThe mean number of legs for both the binomial and beta-binomial distribution is 2.1. However, the binomial variance is 0.63, while the beta-binomial variance is higher at 0.74. This is higher variability is because the beta-binomial systems allows the leg-win probability to vary slightly.",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#probability-mass-function",
+    "href": "Lab8/Lab8WriteUp.html#probability-mass-function",
+    "title": "Lab Eight – Probability",
+    "section": "3.1 Probability Mass Function",
+    "text": "3.1 Probability Mass Function\nThe mass function for this distribution is below. While it used to be available in the MBD package for R, this package is no longer available. \\[f_X(x) = \\frac{1}{c} {n \\choose x} p^x (1-p)^{n-x} \\theta^{x(n-x)}I(x \\in \\{0, 1, ..., n\\})\\] where \\[c = \\sum_{i=0}^n {n \\choose i} p^i (1-p)^{n-i} \\theta^{i(n-i)}\\]\nWrite a function in R called daltbinom() for computing the PMF of this distribution. Use your function to plot the distribution where \\(p=0.70\\) where \\(\\theta=0.50\\), \\(\\theta=1\\), and \\(\\theta=1.50\\). Comment on the differences in the context of a best two-out-of-three match\nSolution\n\n\n\nCode\n#made my function here\ndaltbinom = function(x, p, theta, n){\n  i = 0:n\n\n  c = sum((choose(n,i))*(p^i)*(1-p)^(n-i)*theta^(i*(n-i)))\n\n  pmf = 1/c * choose(n,x) * p^x * (1-p)^(n-x)*theta^(x*(n-x))\n\n  #use logical for indicator\n  return(pmf * (x %in% i))\n}\n\n#created my data table\nggdat = tibble(\n  x = rep(0:3, times = 3),\n  theta = rep(c(0.5,1,1.5),each = 4)\n) |&gt;\n  mutate(\n    PMF = case_when(\n      theta == 0.5 ~ daltbinom(x=x, p = 0.7, theta = 0.5, n = 3),\n      theta == 1 ~ daltbinom(x = x, p = 0.7, theta = 1, n = 3),\n      theta == 1.5 ~ daltbinom(x=x, p = 0.7, theta = 1.5, n = 3)\n    )\n  )\n\n#plot\nPMF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                 aes(x = x, ymin = 0, ymax = PMF, color = factor(theta))) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Probability\") +\n  theme_bw()+\n  facet_wrap(~factor(theta))\n\nPMF.plot\n\n\n\n\nPMF for theta = 0.5, 1, 1.5 and p = 0.7\n\n\n\n\n\n\nBased on the PMF plot, we see that as we vary theta lower, we get a more ‘hot-handed’ effect, where you’re more likely to win more hands the better you’re doing, so we get a clumpy effect. At theta = 1, we get a normal binomial distribution, as we find there to be no effect on the PMF at that number. At higher thetas, we see a less clumpy effect where the number of legs won is more centered around 2, and thus the hot-hand effect has the opposite effect, where wins result in less wins, and it’s more weighted towards Player A’s leg-win probability, p. Thus, we get more 2-1 games.",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#cumulative-distribution-function",
+    "href": "Lab8/Lab8WriteUp.html#cumulative-distribution-function",
+    "title": "Lab Eight – Probability",
+    "section": "3.2 Cumulative Distribution Function",
+    "text": "3.2 Cumulative Distribution Function\nUse your daltbinom() function to create a paltbinom() function for computing the CDF of this distribution. Use your function to plot the distribution where \\(p=0.70\\) where \\(\\theta=0.50\\), \\(\\theta=1\\), and \\(\\theta=1.50\\).\nSolution\nSince the CDF is just the probability that X is less than or equal to some value, I can compute it by summing the PMF from 0 up to x.\n\n\n\nCode\npaltbinom = function(x, p, theta, n){\n  sapply(x, function(z){ #applies function for each 0 to z in x\n    sum(daltbinom(x = 0:z, p = p, theta = theta, n = n))}) #sums PMF values from 0 to z\n}\n\n#created my data table\nggdat = tibble(\n  x = rep(0:3, times = 3),\n  theta = rep(c(0.5,1,1.5),each = 4)\n) |&gt;\n  mutate(\n    CDF = case_when(\n      theta == 0.5 ~ paltbinom(x=x, p = 0.7, theta = 0.5, n = 3),\n      theta == 1 ~ paltbinom(x = x, p = 0.7, theta = 1, n = 3),\n      theta == 1.5 ~ paltbinom(x=x, p = 0.7, theta = 1.5, n = 3)\n    )\n  )\n\n#plot\nCDF.plot = ggplot() +\n  geom_step(data = ggdat, aes(x = x, y = CDF)) +\n  geom_point(data = ggdat,\n             aes(x = x, y = CDF),\n             color = \"darkorchid2\", size = 2) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw() +\n  facet_wrap(~factor(theta))\n\nCDF.plot\n\n\n\n\nCDF for theta = 0.5, 1, 1.5 and p = 0.7\n\n\n\n\n\n\nBased on the CDF plot we see that changing our theta values affects where the cumulative probability clumps up. At lower theta values, probability clumps reflecting the hot-hand effect. Once again, at theta = 1, we get a normal binomial distribution. At greater theta values, the clumpy effect is reduced, with more probability at middle values, thus more likely heading to 2-1 outcomes.",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#the-winning-probability",
+    "href": "Lab8/Lab8WriteUp.html#the-winning-probability",
+    "title": "Lab Eight – Probability",
+    "section": "3.3 The Winning Probability",
+    "text": "3.3 The Winning Probability\nCompute the probability that Player A wins the match using Altham’s Multiplicative Binomial Distribution. Compare your result to the Binomial and Negative Binomial results. Compare your results to the Beta-Binomial model, too. Make sure write out your probability statement and work to write it in terms of the distribution function (PMF/CDF) to plot the probability using ggplot.\nSolution\nOnce again, lets let X be the number of legs Player A wins in a 2-out-of-3 match, where X follows Altham’s Multiplicative Binomial Distribution. Since Player A wins the game if they win at least 2 legs, we are looking for \\(P(X\\geq2)\\). This is the same as:\n\\[P(X\\geq2) = 1 - P(X\\leq1) = 1- F_X(1)\\].\n\n\n\nCode\n#each theta case here\nwin_prob_0.5 = 1 - paltbinom(x = 1, p = 0.7, theta = 0.5, n = 3)\nwin_prob_0.5\n\n\n[1] 0.8592417\n\n\nCode\nwin_prob_1 = 1 - paltbinom(x = 1, p = 0.7, theta = 1, n = 3)\nwin_prob_1\n\n\n[1] 0.784\n\n\nCode\nwin_prob_1.5 = 1 - paltbinom(x = 1, p = 0.7, theta = 1.5, n = 3)\nwin_prob_1.5\n\n\n[1] 0.746993\n\n\nCode\nggdat = tibble(\n  x = rep(0:3, times = 3),\n  theta = rep(c(0.5, 1, 1.5), each = 4)\n) |&gt;\n  mutate(\n    PMF = case_when(\n      theta == 0.5 ~ daltbinom(x = x, p = 0.7, theta = 0.5, n = 3),\n      theta == 1 ~ daltbinom(x = x, p = 0.7, theta = 1, n = 3),\n      theta == 1.5 ~ daltbinom(x = x, p = 0.7, theta = 1.5, n = 3)\n    ),\n    CDF = case_when(\n      theta == 0.5 ~ paltbinom(x = x, p = 0.7, theta = 0.5, n = 3),\n      theta == 1 ~ paltbinom(x = x, p = 0.7, theta = 1, n = 3),\n      theta == 1.5 ~ paltbinom(x = x, p = 0.7, theta = 1.5, n = 3)\n    )\n  )\n\nPMF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                 aes(x = x, ymin = 0, ymax = PMF)) +\n  geom_linerange(data = ggdat |&gt; filter(x &gt;= 2),\n                 aes(x = x, ymin = 0, ymax = PMF),\n                 color = \"darkorchid2\", linewidth = 2, alpha = 0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Probability\") +\n  theme_bw() +\n  facet_wrap(~factor(theta))\n\nCDF.plot = ggplot() +\n  geom_step(data = ggdat, aes(x = x, y = CDF)) +\n  geom_point(data = ggdat |&gt; filter(x == 1),\n             aes(x = x, y = CDF),\n             color = \"darkorchid2\", size = 2.5, alpha = 0.5) +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Cumulative Probability\") +\n  theme_bw() +\n  facet_wrap(~factor(theta))\n\nPMF.plot | CDF.plot\n\n\n\n\nAltham’s Multiplicative Binomial Distribution with theta = 0.5, 1,r 1.5 and p = 0.7\n\n\n\n\n\n\nWhen theta is 1, the model gives the same result as in the ordinary binomial distribution. When theta is 0.5, the distribution is more clumpy so it is more likely Player A will win as wins influence more wins, already being influenced by Player A’s 70% leg-win chance. When theta is 1.5, distribution is more centerd around the center, thus a greater 2-1 outcome, thus influencing a relatively lower win chance for Player A.\nBoth the binomial and negative binomial gave a win probability of 0.784, while the beta-binomial model gave a lower win probability of 0.7636. For Altham’s it depends on the theta value used. For lower theta values the win probability is higher than the rest of the models. For higher theta values the win probability is lowered even below all the other models’ win probability. Altham’s model better models the case where legs have a dependent, not independent, effect on other legs.",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab8/Lab8WriteUp.html#probability-mass-function-1",
+    "href": "Lab8/Lab8WriteUp.html#probability-mass-function-1",
+    "title": "Lab Eight – Probability",
+    "section": "4.1 Probability Mass Function",
+    "text": "4.1 Probability Mass Function\nThe mass function for this distribution is below. \\[f_X(x) = \\left[\\int_{0}^1 dp\n\\left(\\frac{1}{c} {n \\choose x} p^x (1-p)^{n-x} \\theta^{x(n-x)}\\right)\\left(\\frac{\\Gamma(\\alpha+\\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)} p^{\\alpha-1}(1-p)^{\\beta-1}\\right)\\right]I(x \\in \\{0, 1, ..., n\\})\\]\nWrite a function in R called daltbbinom() for computing the PMF of this distribution. Use your function to plot the distribution where \\(\\alpha=7\\) and \\(\\beta=3\\) where \\(\\theta=0.50\\), \\(\\theta=1\\), and \\(\\theta=1.50\\). Comment on the differences in the context of a best two-out-of-three match.\n\nHint: You can use the integrate() in R to compute the integral. Note that this requires the function to be vectorized – it should be unless you have added any block conditionals.\nSolution\n\n\n\nCode\ndaltbbinom = function(x, alpha, beta, theta, n){\n  #I had an issue because integrate() passes in multiple values of p at once,\n  #so I used a second sapply() to evaluate one p-value at a time\n  # hence the double sapply, i wont lie i had to consult oscar for this bc i didnt understand why my PMF was not adding up to 1 before. \n\n  sapply(x, function(z){ #apply from 0 to z in x\n    f_x = function(p){\n      sapply(p, function(m){ #apply from 0 to m in p (ik my naming convention sucks, i had to try a bunch of things for this to work out)\n        daltbinom(x = z, p = m, theta = theta, n = n) * dbeta(m, alpha, beta)\n      })\n    }\n    integrate(f_x, lower = 0, upper = 1)$value\n  })\n}\n\nggdat = tibble(\n  x = rep(0:3, times = 3),\n  theta = rep(c(0.5, 1, 1.5), each = 4)\n) |&gt;\n  mutate(\n    PMF = case_when(\n      theta == 0.5 ~ daltbbinom(x = x, alpha = 7, beta = 3, theta = 0.5, n = 3),\n      theta == 1 ~ daltbbinom(x = x, alpha = 7, beta = 3, theta = 1, n = 3),\n      theta == 1.5 ~ daltbbinom(x = x, alpha = 7, beta = 3, theta = 1.5, n = 3)\n    )\n  )\n\nPMF.plot = ggplot() +\n  geom_linerange(data = ggdat,\n                 aes(x = x, ymin = 0, ymax = PMF),\n                 linewidth = 1, color = \"darkorchid2\") +\n  geom_hline(yintercept = 0) +\n  scale_x_continuous(\"x\", breaks = 0:3) +\n  ylab(\"Probability\") +\n  theme_bw() +\n  facet_wrap(~factor(theta))\n\nPMF.plot\n\n\n\n\nPMF for Altham’s Multiplicative BB Distribution with theta = 0.5, 1, 1.5, alpha = 7, and beta = 3\n\n\n\n\n\n When theta is 0.5, we see the same clumpy effect towards 3 where Player A is much more likely to win all 3 games. When theta is 1, we reduce back down to the Beta-binomial model. When theta is 1.5, the distribution gets to be less clumpy and more centered around 2 wins, results in 2-1 matches more.",
+    "crumbs": [
+      "Lab Eight -- Probability"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html",
+    "href": "Lab10/Lab10WriteUp.html",
+    "title": "Lab Ten – Point Estimation",
+    "section": "",
+    "text": "Tips",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#althams-multiplicative-binomial-distribution",
+    "href": "Lab10/Lab10WriteUp.html#althams-multiplicative-binomial-distribution",
+    "title": "Lab Ten – Point Estimation",
+    "section": "1.1 Altham’s Multiplicative Binomial Distribution",
+    "text": "1.1 Altham’s Multiplicative Binomial Distribution\nThe PMF for Altham’s Multiplicative Binomial Distribution is \\[f_X(x) = \\frac{1}{c} {n \\choose x} p^x (1-p)^{n-x} \\theta^{x(n-x)}I(x \\in \\{0, 1, ..., n\\})\\] where \\[c = \\sum_{i=0}^n {n \\choose i} p^i (1-p)^{n-i} \\theta^{i(n-i)}.\\] Just so we start on the same page, I have included my R function for computing probability using this distribution.\n\n\n\nCode\ndaltbinom &lt;- function(x, size, prob, theta){\n  normalizing.constant &lt;- 0\n  for(j in 0:size){\n    normalizing.constant &lt;- normalizing.constant + \n      choose(size, j) * prob^j * (1-prob)^(size-j) * theta^(j*(size-j))\n  }\n  # Probability Mass at x=x\n  (1/normalizing.constant) *\n    choose(size, x) * prob^x * (1-prob)^(size-x) * theta^(x*(size-x)) *\n      (x&gt;=0)*(x&lt;=size)\n}",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-a",
+    "href": "Lab10/Lab10WriteUp.html#part-a",
+    "title": "Lab Ten – Point Estimation",
+    "section": "3.1 Part a",
+    "text": "3.1 Part a\nSuppose a player has a 50% chance of winning a specific leg, that is let \\(p=0.50\\). Let’s look at the probability they win (\\(x=6\\)) legs in the match. Compute this probability over a sequence from \\(\\theta=0.5\\) to \\(\\theta=1.5\\) and plot it using a line where the \\(x\\)-axis is \\(\\theta\\) and the \\(y\\)-axis is \\(P(X=6)\\).\nSolution\nI created a faux continuous sequence of theta values by creating a vector of very small values between 0 and 1.5 theta. I then applied althams binomial distribution to the ‘continuous’ theta values looking for where X is exactly 6, or win the game. We see its not very likely for a player to win exaclty 6 matches when theta is low, but that probility goes up at theta does.\n\n\n\nCode\nprob_data = tibble(\n  theta = seq(0,1.5, by = 0.01)\n) |&gt; \n  mutate(\n    prob_6 = sapply(theta, function(theta_sing){\n      daltbinom(x=6, size = 11, prob = 0.5, theta = theta_sing)\n    })\n  )\n\nprob_data |&gt;\n  ggplot(aes(x = theta, y = prob_6)) +\n  geom_line(linewidth = 1) + \n  xlab(\"theta\") +\n  ylab(\"P(X=6)\") + \n  theme_bw()\n\n\n\n\nProbability of Winning 6 Legs",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-b",
+    "href": "Lab10/Lab10WriteUp.html#part-b",
+    "title": "Lab Ten – Point Estimation",
+    "section": "3.2 Part b",
+    "text": "3.2 Part b\nNow, plot Altham’s Multiplicative Binomial Distribution under the same parameters with \\(\\theta=0.50\\), \\(\\theta=1\\), and \\(\\theta=1.5\\). Use ncol=1 in facet_wrap() to plot the PMFs in a single column for comparing.\nSolution\nNow I applied althams on specific theta values and on a range of x values, or number of wins, in order to show the probability of number of wins depending on theta values.\n\n\n\nCode\npmf_05 = tibble(\n  x = 0:11,\n  theta = 0.5,\n  prob = sapply(x, function(x_val){\n    daltbinom(x = x_val, size = 11, prob = 0.5, theta = 0.5)\n  })\n)\n\npmf_1 = tibble(\n  x = 0:11,\n  theta = 1,\n  prob = sapply(x, function(x_val){\n    daltbinom(x = x_val, size = 11, prob = 0.5, theta = 1)\n  })\n)\n\npmf_15 = tibble(\n  x = 0:11,\n  theta = 1.5,\n  prob = sapply(x, function(x_val){\n    daltbinom(x = x_val, size = 11, prob = 0.5, theta = 1.5)\n  })\n)\n\npmf_data = bind_rows(pmf_05, pmf_1, pmf_15)\n\npmf_data |&gt;\n  ggplot(aes(x = x, y = prob)) +\n  geom_line(linewidth = 1) +\n  facet_wrap(~theta, ncol = 1) +\n  xlab(\"x\") +\n  ylab(\"P(X=x)\") +\n  theme_bw()\n\n\n\n\nAltham’s for theta = 0.5, 1, 1.5",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-c",
+    "href": "Lab10/Lab10WriteUp.html#part-c",
+    "title": "Lab Ten – Point Estimation",
+    "section": "3.3 Part c",
+    "text": "3.3 Part c\nWhat is your best assessment of what \\(\\theta\\) is doing in this setting. Consider when a 6-0 blowout is most likely, and when a 5-6 nail-biter is most likely. Note here we should treat the match as a fixed \\(n=11\\) as we did for \\(n=3\\) in Lab 8.\nNote: In lab 8, we saw that small \\(\\theta\\) meant wins came in bunches (clumped together), so there were more 2-0 wins in a best of three series.\nSolution\nHere theta is clumping wins and losses. So when theta is small it clumps more, as seen in the theta = 0.5 graph. We see that the greatest probability is attributed to a blowout in either direction, either 11-0 or 0-11. Now when theta is 1, our althams reduces to just a beta distribution looking gaussian. So the probability is centered around 5 or 6 wins but slowly tails off on either side. Now when theta is high like at theta = 1.5, we see a much more tightly centered distribution. The wins are much more centered around 5 or 6 wins which gives a higher likelihood of a nail-biter game, with scores like 5-6 or 6-5.",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-a-1",
+    "href": "Lab10/Lab10WriteUp.html#part-a-1",
+    "title": "Lab Ten – Point Estimation",
+    "section": "4.1 Part a",
+    "text": "4.1 Part a\nAltham’s Multiplicative Binomial Distribution does not typically simplify to the clean \\(E(X)=np\\) seen in the Binomial distribution, unless \\(\\theta = 1\\). Write out the expression that would need to be solved to find \\(E(X^k)\\), and then write a function that computes it given the proposed parameter values \\(p\\) (prob) and \\(\\theta\\) (theta).\nSolution\nTo solve \\(E(X^k)\\), the expression follows:\n\\[E(X^k) = \\sum_{x=0}^{n} x^k P(X=x). \\]\nThen, I just created a simple function that emulates this expression for varying prob and theta values, also size as well.\n\n\n\nCode\naltham_moment = function(size, k, prob, theta){\n  x_vals = 0:size\n\n  moment = sum(sapply(x_vals, function(x){ #sums all together\n    (x^k)*daltbinom(x = x, size = size, prob = prob, theta = theta)\n    })\n  )\n  return(moment)\n}",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-b-1",
+    "href": "Lab10/Lab10WriteUp.html#part-b-1",
+    "title": "Lab Ten – Point Estimation",
+    "section": "4.2 Part b",
+    "text": "4.2 Part b\nDescribe how you can use your answer to part a to find Method of Moments estimates for the parameters \\(p\\) and \\(\\theta\\) for Altham’s Multiplicative Binomial Distribution based on data.\nSolution\nI will get sample moments from the data, then compute theoretical moments from the model, set them equal to each other and solve for \\(p\\) and \\(\\theta\\). Because there are two parameters, I am going to need at least two equations. I would use the first two moments as my equations. I would get my first two moments of the model using my function from the previous part. I would get my first two moments of the data by:\n\\[ E(X) = \\frac{1}{n} \\sum_{i=1}^{n} X_i \\]\nand:\n\\[ E(X^2) = \\frac{1}{n} \\sum_{i=1}^{n} X_i^2 \\]\nI would then set the moments from the model equal to the moments from the data and solve them simultaneously for \\(p\\) and \\(\\theta\\).",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-c-1",
+    "href": "Lab10/Lab10WriteUp.html#part-c-1",
+    "title": "Lab Ten – Point Estimation",
+    "section": "4.3 Part c",
+    "text": "4.3 Part c\nWrite a function that computes the log-likelihood for Altham’s Multiplicative Binomial Distribution, given data (x) and proposed parameter values \\(p\\) (prob) and \\(\\theta\\) (theta).\nSolution\nI made my function, remembering to keep the log inside the summation. It really is just the sum of the log probabilities. I also made my function support a size parameter because I’m cool like that.\n\n\n\nCode\naltham_loglike = function(x, size, prob, theta){\n  loglike = sum(log(\n    sapply(x, function(x_val){\n      daltbinom(x=x_val, size = size, prob = prob, theta = theta)\n    })\n  ))\n  return(loglike)\n}",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#part-d",
+    "href": "Lab10/Lab10WriteUp.html#part-d",
+    "title": "Lab Ten – Point Estimation",
+    "section": "4.4 Part d",
+    "text": "4.4 Part d\nDescribe how you can use your answer to part c to find Maximum Likelihood estimates for the parameters \\(p\\) and \\(\\theta\\) for Altham’s Multiplicative Binomial Distribution based on data.\nSolution\nI would use the log-likelihood function and maximize it with respect to \\(p\\) and \\(\\theta\\) on the data. I wouldn’t do this by hand, but numerically using optim. To keep real parameter values I would transform them such that \\(0 &lt; p &lt; 1\\) and \\(\\theta &gt; 0\\).",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#summarize-the-2024-data",
+    "href": "Lab10/Lab10WriteUp.html#summarize-the-2024-data",
+    "title": "Lab Ten – Point Estimation",
+    "section": "5.1 Summarize the 2024 Data",
+    "text": "5.1 Summarize the 2024 Data\nIn pdc2024.csv, I have provided the data for the 2024 Premier League season. There are a few data cleaning steps to consider.\n\nRemove any matches with no Score (e.g., a bye or walkover)\nNights 1 through 16 are best of 11 (first to 6), but the playoffs are extended. For consistency, keep nights 1 through 16 only.\nMake two columns WinnerLegs and LoserLegs that keep track of the number of legs each player has won\n\nSummarize the data. What do the data tell us about the breakdown of the results?\nSolution\nOur normal summary stats don’t tell us much here, other than the average number of legs the loser has in a game is around 4 (3.56) legs, before they lose. We also see that a total of 111 matches were played. From the player summary we get some more insight. Luke Littler has the most amount of wins, followed by Luke Humphries and Michael Smith. This is telling about the final standings of the tournament where Luke Littler won first place and Luke Humphries came second. However Michael Smith may have won more games than Michael van Gerwen, yet van Gerwen still placed higher. This tells us that it is not always the case that more games won means higher placement. My intuition tells me that it is more important to win the more crucial games than it is to have a higher winning rate. We also see a nice correlation of wins to matches played here.\n\n\n\nCode\npdc2024 = read_csv(\"pdc2024.csv\")\n\npdc_clean = pdc2024 |&gt;\n  filter(Score != \"w/o\") |&gt; #takes out no score games\n  filter(Night != \"Finals\") |&gt; #takes out finals nights\n  separate_wider_delim(Score, delim = \"-\", names = c(\"WinnerLegs\", \"LoserLegs\")) |&gt; #separates score into two new columns based on \"-\"\n\n  mutate(WinnerLegs = as.numeric(WinnerLegs), \n          LoserLegs = as.numeric(LoserLegs)) #made them numeric here, seems like it will be useful later on\n\n#summary part\n\nsummary_stats = pdc_clean |&gt;\n  summarize(\n    TotalMatches = n(),\n    AvgWinnerLegs = mean(WinnerLegs), #obv always going to be 6, but i put it in anyways\n    AvgLoserLegs = mean(LoserLegs),\n    MinLoserLegs = min(LoserLegs),\n    MaxLoserLegs = max(LoserLegs)\n  )\n\nsummary_stats\n\n\n# A tibble: 1 × 5\n  TotalMatches AvgWinnerLegs AvgLoserLegs MinLoserLegs MaxLoserLegs\n         &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;\n1          111             6         3.56            1            5\n\n\nCode\nwins_summary = pdc_clean |&gt;\n  group_by(Winner) |&gt;\n  summarize(Wins = n()) |&gt;\n  mutate(Player = Winner)\n\nlosses_summary = pdc_clean |&gt;\n  group_by(Loser) |&gt;\n  summarize(Losses = n()) |&gt;\n  mutate(Player = Loser)\n\nplayer_summary = full_join(wins_summary, losses_summary, by = \"Player\") |&gt;\n  mutate(Matches = Wins + Losses) |&gt;\n  select(Player, Wins, Losses, Matches) |&gt; #my mediocre fix to keep wins losses and matches only\n  arrange(desc(Wins)) #arranged by wins\n\nplayer_summary\n\n\n# A tibble: 8 × 4\n  Player              Wins Losses Matches\n  &lt;chr&gt;              &lt;int&gt;  &lt;int&gt;   &lt;int&gt;\n1 Luke Littler          24     12      36\n2 Luke Humphries        20     12      32\n3 Michael Smith         17     14      31\n4 Michael van Gerwen    16     12      28\n5 Nathan Aspinall       15     14      29\n6 Rob Cross             10     16      26\n7 Gerwyn Price           7     15      22\n8 Peter Wright           2     16      18",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#althams-multiplicative-binomial-distribution-1",
+    "href": "Lab10/Lab10WriteUp.html#althams-multiplicative-binomial-distribution-1",
+    "title": "Lab Ten – Point Estimation",
+    "section": "5.2 Altham’s Multiplicative Binomial Distribution",
+    "text": "5.2 Altham’s Multiplicative Binomial Distribution\nFor each player in the 2024 season, use the number of legs won in each match to compute maximium likelihood estimates for \\(p\\) and \\(\\theta\\).\nNote: The “for each” here can be done more efficiently with a function or a loop!\n\nCreate a vector containing the number of legs won by the player. Note sometimes you will need to pull from winner’s legs and sometimes from the loser’s legs.\nFind the MLE for the player using this data. Ensure to report \\(p\\) and \\(\\theta\\) for each player in a nicely formatted table.\nNote: In Lecture on Monday, we used transformations to restrict how optim() searches the parameter space. For example, here, you might consider p &lt;- 1/(1+exp(-par[1])) and theta &lt;- exp(par[2]).\nMake comments about the MLEs in the context of the standings.\n\nSolution\n\n\n\nCode\nwinner_legs = pdc_clean |&gt;\n  select(Player = Winner, LegsWon = WinnerLegs)\n\nloser_legs = pdc_clean |&gt;\n  select(Player = Loser, LegsWon = LoserLegs)\n\nplayer_legs = bind_rows(winner_legs, loser_legs) #this has all the won legs from both when they win or lose the overall matches\n\nll_altham = function(par, data, size, mle = F){ #this was all adapted from class notes\n  prob = ifelse(mle, 1 / (1 + exp(-par[1])), par[1]) #restricting\n  theta = ifelse(mle, exp(par[2]), par[2])\n\n  ll = altham_loglike(x = data, size = size, prob = prob, theta = theta)\n\n  ifelse(mle, -ll, ll)\n}\n\nget_altham_mle = function(data, size){ #function to grab params by player\n  mle = optim(\n    par = c(0, 0), #starting val\n    fn = ll_altham, #my function for optim\n    data = data,\n    size = size,\n    mle = T\n  )\n\n  return(c(prob = 1 / (1 + exp(-mle$par[1])), theta = exp(mle$par[2])) #results here\n  )\n}\n\n#formatting into nice table, filling values in from our mle function\n#i struggled with this a lot, ive been having a tough time figuring out how to nicely set up tables... \n#this was what i could come up with, but i hate it\n\nplayers = unique(player_legs$Player) #only want one instance of each player\n\nplayer_mle = tibble( #blank table first\n  Player = character(),\n  prob = numeric(),\n  theta = numeric()\n)\n\nfor(player_name in players){ \n  \n  player_data = player_legs |&gt; \n    filter(Player == player_name) #singling out\n\n  player_data = player_data$LegsWon\n  \n  mle_fit = get_altham_mle(data = player_data, size = 11) #applying function\n  \n  player_mle = bind_rows( #imputing values\n    player_mle, tibble(Player = player_name,\n                      prob = mle_fit[\"prob\"],\n                      theta = mle_fit[\"theta\"])\n                ) |&gt;\n    arrange(desc(prob))\n}\n\nplayer_mle\n\n\n# A tibble: 8 × 3\n  Player              prob theta\n  &lt;chr&gt;              &lt;dbl&gt; &lt;dbl&gt;\n1 Luke Littler       0.469 1.32 \n2 Luke Humphries     0.461 1.20 \n3 Michael van Gerwen 0.431 1.02 \n4 Michael Smith      0.426 1.05 \n5 Nathan Aspinall    0.403 1.19 \n6 Rob Cross          0.395 1.01 \n7 Gerwyn Price       0.383 1.02 \n8 Peter Wright       0.317 0.989\n\n\n\nGiven our MLE table, we see that Luke Littler has the highest prob and theta values. Our prob values are the probabilities of each player winning a leg, and thus, it follows that players who are better at winning a leg generally tend to do better in the competition. As we can see, Luke Littler has the highest prob value while placing first, and Peter Wright had the lowest prob value while placing last. The estimated theta values all are reasonably close to 1 here, which suggests that players’ matches don’t show that much bunching compared to the normal binomial case. However, Luke Littler’s theta is much higher (1.32), showcasing that his match results were much more competitive, rather than blow-outs. Overall, prob tends to better predict standings overall, while theta tends to better predict specific match result distributions.",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#althams-multiplicative-beta-binomial-distribution-1",
+    "href": "Lab10/Lab10WriteUp.html#althams-multiplicative-beta-binomial-distribution-1",
+    "title": "Lab Ten – Point Estimation",
+    "section": "5.3 Altham’s Multiplicative Beta Binomial Distribution",
+    "text": "5.3 Altham’s Multiplicative Beta Binomial Distribution\nFor each player in the 2024 season, use the number of legs won in each match to compute maxmium likelihood estimates for \\(p\\) and \\(\\theta\\).\nNote: The “for each” here can be done more efficiently with a function or a loop!\n\nCreate a vector containing the number of legs won by the player. Note sometimes you will need to pull from winner’s legs and sometimes from the loser’s legs.\nFind the MLEs for the player using this data. Ensure to report \\(\\alpha\\), \\(\\beta\\), and \\(\\theta\\) for each player in a nicely formatted table.\nNote 1: Due to the computational complexity of integrate(), you should compute the logged probability for 0:6 once and add them according to the data in each player’s vector. Note 2: In Lecture on Monday, we used transformations to restrict how optim() searches the parameter space.\nPlot the underlying Beta(\\(\\alpha\\), \\(\\beta\\)) distribution for each player.\nNote: Add the mean and variance of the Beta to the table of MLEs. Recall \\[\\begin{align*}\nE(X)   &= \\frac{\\alpha}{\\alpha+\\beta}\\\\\nsd(X) &= \\sqrt{\\frac{\\alpha\\beta}{(\\alpha+\\beta)^2(\\alpha+\\beta+1)}}\n\\end{align*}\\]\nMake comments about the MLEs in the context of the standings.\nNote: The players alternate who throws first in a leg has the mathematical “head start” to reach a finish before their opponent can take another turn. Players alternate who throws first with each leg.\n\nSolution\n\n\n\nCode\nll_altham_beta = function(par, data, size, mle = F){ #same step where i adapted from class notes\n  alpha = ifelse(mle, exp(par[1]), par[1]) #restricted by making them all positive via exponents\n  beta = ifelse(mle, exp(par[2]), par[2])\n  theta = ifelse(mle, exp(par[3]), par[3])\n\n  probs = daltbbinom(x = 0:6, size = size, alpha = alpha, beta = beta, theta = theta) #precomputed probs as given in the note \n\n  log_probs = log(probs) #now logged\n\n  ll = sum(log_probs[data + 1]) #need data+1 \n  #for indexing (stupid R indexes at 1 first, although this is nicer to read, i forgot abt this)\n\n  ifelse(mle, -ll, ll)\n}\n\nget_altham_beta_mle = function(data, size){ #same idea as before\n  mle = optim(\n    par = c(0, 0, 0), #start vals\n    fn = ll_altham_beta,\n    data = data,\n    size = size,\n    mle = T\n  )\n  c(alpha = exp(mle$par[1]),\n    beta = exp(mle$par[2]),\n    theta = exp(mle$par[3])\n  )\n}\n\n#exact same idea as before, just copy pasted and made changes\nplayers = unique(player_legs$Player)\n\nplayer_beta_mle = tibble(\n  Player = character(),\n  alpha = numeric(),\n  beta = numeric(),\n  theta = numeric()\n)\n\nfor(player_name in players){\n  \n  player_data = player_legs |&gt;\n    filter(Player == player_name)\n\n  player_data = player_data$LegsWon\n  \n  mle_fit = get_altham_beta_mle(data = player_data, size = 11)\n  \n  player_beta_mle = bind_rows(\n    player_beta_mle,\n    tibble(Player = player_name,\n      alpha = mle_fit[\"alpha\"],\n      beta = mle_fit[\"beta\"],\n      theta = mle_fit[\"theta\"]\n    )\n  )\n}\n\nplayer_beta_mle = player_beta_mle |&gt; #adding var and E(X)\n  mutate(\n    mean = alpha/(alpha+beta),\n    sd = sqrt((alpha*beta) /(((alpha+beta)^2)*(alpha+beta+1)))\n  ) |&gt;\n  arrange(desc(mean))\n\n#plotting section, i know this isnt optimal (\"I CAN DO WHATEVER I WANT\" - the great WC)\np_vals = seq(0.001, 0.999, by = 0.001)\n\nbeta_plot = tibble(\n  Player = rep(player_beta_mle$Player, each = length(p_vals)),\n  p = rep(p_vals, times = nrow(player_beta_mle)),\n  density = c(\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[1], shape2 = player_beta_mle$beta[1]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[2], shape2 = player_beta_mle$beta[2]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[3], shape2 = player_beta_mle$beta[3]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[4], shape2 = player_beta_mle$beta[4]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[5], shape2 = player_beta_mle$beta[5]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[6], shape2 = player_beta_mle$beta[6]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[7], shape2 = player_beta_mle$beta[7]),\n    dbeta(p_vals, shape1 = player_beta_mle$alpha[8], shape2 = player_beta_mle$beta[8])\n  )\n)\n\nbeta_plot |&gt;\n  ggplot(aes(x = p, y = density)) +\n  geom_line(linewidth = 1) +\n  facet_wrap(~Player, ncol = 3) +\n  xlab(\"p\") +\n  ylab(\"Density\") +\n  theme_bw()\n\n\n\n\n\n\n\n\n\nCode\n#MLE table here (want to show last)\nplayer_beta_mle\n\n\n# A tibble: 8 × 6\n  Player             alpha  beta theta  mean    sd\n  &lt;chr&gt;              &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 Luke Littler       0.283 0.384 10.8  0.425 0.383\n2 Luke Humphries     0.331 0.490  6.39 0.403 0.363\n3 Nathan Aspinall    2.47  4.34   1.49 0.363 0.172\n4 Michael Smith      0.534 1.07   2.24 0.334 0.292\n5 Michael van Gerwen 0.219 0.454  5.00 0.325 0.362\n6 Rob Cross          0.268 0.813  3.20 0.248 0.299\n7 Gerwyn Price       0.264 0.917  3.18 0.224 0.282\n8 Peter Wright       1.79  7.29   1.21 0.197 0.125\n\n\n\nThe MLEs mostly agree with the standings overall. Luke Littler has the greatest beta mean suggesting a greater leg-winning probability, while Peter Wright has the lowest beta mean matching his last place performance. Players between them seem to also have matching mean values relative to their standing. Theta values here were also very varying. Luke Littler had a massive theta value of 10.8, suggesting that his results were extremely centered around nail-biting matches, while Peter Wright had a much lower theta value, suggesting a less centered results distribution comparatively to Littler’s. Overall, the fitted beta means seem to capture standings pretty well, while theta helps to show match results distributions nicely.",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab10/Lab10WriteUp.html#executive-summary",
+    "href": "Lab10/Lab10WriteUp.html#executive-summary",
+    "title": "Lab Ten – Point Estimation",
+    "section": "5.4 Executive Summary",
+    "text": "5.4 Executive Summary\nSummarize the work you’ve done here to provide a brief (200-300 word) data-driven summary of the 2024 Premier League season using your work in Lab 10. Your summary should be professional, clear, and all claims should be corroborated with statistical support.\nSolution\nWhile the competition was fierce, the results of a data-driven analysis showed clear differences in player strength. After removing the walkover and Finals rounds, the data set contained 111 matches played. The average number of legs won by the loser in a given match was 3.56, suggesting that most matches were close rather than complete blowouts. In the first player summary, Luke Littler had 24 wins, followed by Luke Humphries with 20, and in last place, Peter Wright only had 2 wins in the whole competition.\nUsing Altham’s Multiplicative Binomial Model, the estimated leg-win probability p did well to predict standings overall. Luke Littler had the largest p at 0.469, while Peter Wright had the lowest estimate p value at 0.317. The fitted theta values were close to 1, suggesting that most player’s matches were not much more clumped than the normal binomial model.\nThe Altham’s Multiplicative Beta-Binomial Model gave a more robust analysis by allowing the leg-win probability to vary a little bit across matches. The fitted beta means did well to predict standings overall here. Luke Littler had the highest with 0.425, followed by Luke Humphries, and again Peter Wright had the lowest at 0.197. The estimated theta values varied a lot here. Luke Littler had a theta value of 10.8, suggesting close and competitive match outcomes, while Peter Wright had a lower theta value of 1.21, suggesting less tightly centered match outcomes. Overall, this model gave a much more thorough analysis of the players’ qualities and matches’ variability.",
+    "crumbs": [
+      "Lab Ten -- Point Estimation"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-a",
+    "href": "Lab2/Lab2WriteUp.html#part-a",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "1.1 Part a",
+    "text": "1.1 Part a\nInstall the esquisse package for R. Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that we don’t install the package every time you compile your Quarto document.\nSolution\n\n\n\nCode\ninstall.packages('esquisse')",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-b",
+    "href": "Lab2/Lab2WriteUp.html#part-b",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "1.2 Part b",
+    "text": "1.2 Part b\nLoad the esquisse package for R. Report the code below. It does not matter whether you set “#| eval: false” because loading the package does not add a lot of time. Note you will not evaluate any code that uses the esquisse package, so there is no need to load it as you compile your Quarto document.\nSolution\n\n\n\nCode\nlibrary('esquisse')",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-c",
+    "href": "Lab2/Lab2WriteUp.html#part-c",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "1.3 Part c",
+    "text": "1.3 Part c\nHow can you ask for help about the esquisse package for R? Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that the help document isn’t loaded every time you compile your Quarto document.\nSolution\n\n\n\nCode\nhelp(esquisser)",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-d",
+    "href": "Lab2/Lab2WriteUp.html#part-d",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "1.4 Part d",
+    "text": "1.4 Part d\nIs a demo or vignette available for the esquisse package for R? Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that the you don’t get errors when you compile your Quarto document.",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-e",
+    "href": "Lab2/Lab2WriteUp.html#part-e",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "1.5 Part e",
+    "text": "1.5 Part e\nAdd the BibTeX citation for esquisse package for R to your .bib file and cite it in a sentence describing what the package does below. Note you can reference a citation named esquisse using “[@esquisse]”.",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-f",
+    "href": "Lab2/Lab2WriteUp.html#part-f",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "1.6 Part f",
+    "text": "1.6 Part f\nRun esquisser() in your console – not in a chunk of R code in your Quarto document.\n\nSelect palmerpenguins from the “Select an environment in which to search:” dropdown. This should automatically select penguins in the “Select a data.frame:” dropdown. Click “Import Data”.\nDrag body_mass_g to the X box and species to the fill box.\nDescribe what you see in words. What can you conclude about Adelie, Chinstrap, and Gentoo penguins based on the resulting plot?",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-a-1",
+    "href": "Lab2/Lab2WriteUp.html#part-a-1",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "2.1 Part a",
+    "text": "2.1 Part a\nThe Fibonacci Sequence is a recursive formula: \\[F_n = F_{n-1} + F_{n-2}\\] where \\(F_0=0\\) and \\(F_1=1\\).\nCreate a vector of the first 10 Fibonacci numbers.",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-b-1",
+    "href": "Lab2/Lab2WriteUp.html#part-b-1",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "2.2 Part b",
+    "text": "2.2 Part b\nTriangular Numbers are the cumulative sums of natural numbers: \\[F_n = \\frac{n(n+1)}{2}.\\]\nCreate a vector of the first 10 Triangular Numbers.",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-c-1",
+    "href": "Lab2/Lab2WriteUp.html#part-c-1",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "2.3 Part c",
+    "text": "2.3 Part c\nSuppose I were designing a repeated meausres experiment with three treatment conditions. Each of \\(n=10\\) participants (with ID 1 to 10) will receive all experimental conditions, call them “Control”, “Treatment A”, and “Treatment B”.\nConsider setting up data entry for this experiment.\n\nCreate a vector containing each ID repeated three times, once for each treatment.\nCreate a vector containing each Treatment repeated for each participant ID.",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab2/Lab2WriteUp.html#part-d-1",
+    "href": "Lab2/Lab2WriteUp.html#part-d-1",
+    "title": "Lab Two – Basic Tasks in R",
+    "section": "2.4 Part d",
+    "text": "2.4 Part d\nCreate a vector containing the character “MATH” and the numeric 240. What is the resulting class? Explain why in a sentence.",
+    "crumbs": [
+      "Lab Two -- Basic Tasks in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html",
+    "href": "Lab3/Lab3WriteUp.html",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "",
+    "text": "Consider the unit square depicted in Figure 1.\nCode\nggplot() +\n  geom_segment(aes(x = 0, xend = 0,\n                   y=0, yend = 1))+\n  geom_segment(aes(x = 0, xend = 1,\n                   y=1, yend = 1))+\n  geom_segment(aes(x = 1, xend = 1,\n                   y=0, yend = 1))+\n  geom_segment(aes(x = 0, xend = 1,\n                   y=0, yend = 0)) +\n  theme_bw() + \n  xlim(-0.5, 1.5)+\n  ylim(-0.5, 1.5)+\n  labs(x = \"x\", \n       y = \"y\")\n\n\n\n\n\nFigure 1: The unit square.\nThe unit square can be defined by two basis vectors \\[\\mathbf{v}_1=\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} ~~~ \\textrm{and} ~~~ \\mathbf{v}_2=\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}.\\] From these vectors, we can compute the corner verticies. \\[\\begin{align*}\n  p_0 & = (0,0) = (x_0, y_0) \\tag{The origin}\\\\\n  p_1 & = v_1 = (x_1, y_1)   \\tag{The first basis vector}\\\\\n  p_2 & = v_1 + v_2 = (x_2, y_2) \\tag{The sum of basis vectors}\\\\\n  p_3 & = v_1 = (x_3, y_3)  \\tag{The second basis vector}\\\\\n\\end{align*}\\] Note that the segments that form the boundary go from \\(p_0\\) to \\(p_1\\) to \\(p_2\\) to \\(p_3\\).\nConsider the matrix \\(M\\) to be the matrix we get from binding the two basis vectors at the column, \\[\\mathbf{M} = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}.\\]",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-a",
+    "href": "Lab3/Lab3WriteUp.html#part-a",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "1.1 Part a",
+    "text": "1.1 Part a\nCreate the matrix A in R. \\[\\mathbf{A} = \\begin{bmatrix} 1 & -7 \\\\ 5 & 9 \\end{bmatrix}\\]\nSolution Matrix A:\n\n\n(A = matrix(c(1,5,-7,9),2,2))\n\n     [,1] [,2]\n[1,]    1   -7\n[2,]    5    9",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-b",
+    "href": "Lab3/Lab3WriteUp.html#part-b",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "1.2 Part b",
+    "text": "1.2 Part b\nCompute the product below in R and store it in an object T. \\[\\mathbf{T} = \\mathbf{A}\\mathbf{M}.\\]\nSolution\n\n\n(T = A%*%M)\n\n     [,1] [,2]\n[1,]    1   -7\n[2,]    5    9",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-c",
+    "href": "Lab3/Lab3WriteUp.html#part-c",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "1.3 Part c",
+    "text": "1.3 Part c\nCreate basis.vector.1 (first column of T) and basis.vector.2 (second column of T) in R.\n\n\n\nCode\n(basis.vector.1 = T[,1])\n\n\n[1] 1 5\n\n\nCode\n(basis.vector.2 = T[,2])\n\n\n[1] -7  9",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-d",
+    "href": "Lab3/Lab3WriteUp.html#part-d",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "1.4 Part d",
+    "text": "1.4 Part d\nCompute the points \\(p_0\\), \\(p_1\\), \\(p_2\\), and \\(p_3\\).\n\n\n(p0 = c(0,0))\n\n[1] 0 0\n\n(p1 = basis.vector.1)\n\n[1] 1 5\n\n(p2 = basis.vector.1 + basis.vector.2)\n\n[1] -6 14\n\n(p3 = basis.vector.2)\n\n[1] -7  9",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-e",
+    "href": "Lab3/Lab3WriteUp.html#part-e",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "1.5 Part e",
+    "text": "1.5 Part e\nCopy and paste the code for the unit square. Edit the code to draw the segments that form the boundary based on the points in Part d.\nSolution\n\n\n\nCode\nggplot() +\n  geom_segment(aes(x = p0[1], y = p0[2], xend = p1[1], yend = p1[2])) +\n  geom_segment(aes(x = p1[1], y = p1[2], xend = p2[1], yend = p2[2])) +\n  geom_segment(aes(x = p2[1], y = p2[2], xend = p3[1], yend = p3[2])) +\n  geom_segment(aes(x = p3[1], y = p3[2], xend = p0[1], yend = p0[2])) +\n  theme_bw() + \n  xlim(-10, 10)+\n  ylim(0, 20)+\n  labs(x = \"x\", \n       y = \"y\")\n\n\n\n\n\nFigure 2: Matrix T on a Graph.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-f",
+    "href": "Lab3/Lab3WriteUp.html#part-f",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "1.6 Part f",
+    "text": "1.6 Part f\nInterestingly, the determinant of \\(\\mathbf{A}\\) gives us the area of the shape plotted in Part e. Find the determinant of \\(\\mathbf{A}\\).\nSolution\n\n\n(det(A))\n\n[1] 44",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-a-1",
+    "href": "Lab3/Lab3WriteUp.html#part-a-1",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "2.1 Part a",
+    "text": "2.1 Part a\nCreate the matrix A in R. \\[\\mathbf{A} = \\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}\\]\nSolution\n\n\n(A = matrix(c(1,2,2,4),2,2))\n\n     [,1] [,2]\n[1,]    1    2\n[2,]    2    4",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-b-1",
+    "href": "Lab3/Lab3WriteUp.html#part-b-1",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "2.2 Part b",
+    "text": "2.2 Part b\nCompute the product below in R and store it in an object T. \\[\\mathbf{T} = \\mathbf{A}\\mathbf{M}.\\]\nSolution\n\n\n\nCode\n(T = A%*%M)\n\n\n     [,1] [,2]\n[1,]    1    2\n[2,]    2    4",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-c-1",
+    "href": "Lab3/Lab3WriteUp.html#part-c-1",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "2.3 Part c",
+    "text": "2.3 Part c\nCreate basis.vector.1 (first column of T) and basis.vector.2 (second column of T) in R.\nSolution\n\n\n(basis.vector.1 = T[,1])\n\n[1] 1 2\n\n(basis.vector.2 = T[,2])\n\n[1] 2 4",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-d-1",
+    "href": "Lab3/Lab3WriteUp.html#part-d-1",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "2.4 Part d",
+    "text": "2.4 Part d\nCompute the points \\(p_0\\), \\(p_1\\), \\(p_2\\), and \\(p_3\\).\nSolution\n\n\n(p0 = c(0,0))\n\n[1] 0 0\n\n(p1 = basis.vector.1)\n\n[1] 1 2\n\n(p2 = basis.vector.1+basis.vector.2)\n\n[1] 3 6\n\n(p3 = basis.vector.2)\n\n[1] 2 4",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-e-1",
+    "href": "Lab3/Lab3WriteUp.html#part-e-1",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "2.5 Part e",
+    "text": "2.5 Part e\nCopy and paste the code for plotting the unit square. Edit the code to draw the segments that form the boundary based on the points in Part d.\nSolution\n\n\n\nCode\nggplot() +\n  geom_segment(aes(x = p0[1], y = p0[2], xend = p1[1], yend = p1[2])) +\n  geom_segment(aes(x = p1[1], y = p1[2], xend = p2[1], yend = p2[2])) +\n  geom_segment(aes(x = p2[1], y = p2[2], xend = p3[1], yend = p3[2])) +\n  geom_segment(aes(x = p3[1], y = p3[2], xend = p0[1], yend = p0[2])) +\n  theme_bw() + \n  xlim(-10, 10)+\n  ylim(0, 20)+\n  labs(x = \"x\", \n       y = \"y\")\n\n\n\n\n\nFigure 3: Matrix T (ver. 2) on a Graph.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-f-1",
+    "href": "Lab3/Lab3WriteUp.html#part-f-1",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "2.6 Part f",
+    "text": "2.6 Part f\nInterestingly, the determinant of \\(\\mathbf{A}\\) gives us the area of the shape plotted in Part e. Find the determinant of \\(\\mathbf{A}\\).\nSolution\n\n\n(det(A))\n\n[1] 0",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-a-2",
+    "href": "Lab3/Lab3WriteUp.html#part-a-2",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "3.1 Part a",
+    "text": "3.1 Part a\nUse the following to generate a new shape. Compare the shape and its area to your answer in Question 1.\n\\[\\mathbf{M}_v = \\begin{bmatrix} 1 & k=0.5 \\\\ 0 & 1 \\end{bmatrix} ~~~~~ \\textrm{and} ~~~~~\n  \\mathbf{A}   = \\begin{bmatrix} 1 & -7 \\\\ 5 & 9 \\end{bmatrix}\\]\nSolution\n\n\n(Mv = matrix(c(1,0,0.5,1),2,2))\n\n     [,1] [,2]\n[1,]    1  0.5\n[2,]    0  1.0\n\n(A = matrix(c(1,5,-7,9),2,2))\n\n     [,1] [,2]\n[1,]    1   -7\n[2,]    5    9\n\n(T = A%*%Mv)\n\n     [,1] [,2]\n[1,]    1 -6.5\n[2,]    5 11.5\n\n(p0 = c(0,0))\n\n[1] 0 0\n\n(p1 = T[,1])\n\n[1] 1 5\n\n(p2 = T[,1]+T[,2])\n\n[1] -5.5 16.5\n\n(p3 = T[,2])\n\n[1] -6.5 11.5\n\n\n\n\n\n\nCode\nggplot() +\n  geom_segment(aes(x = p0[1], y = p0[2], xend = p1[1], yend = p1[2]))+\n  geom_segment(aes(x = p1[1], y = p1[2], xend = p2[1], yend = p2[2]))+\n  geom_segment(aes(x = p2[1], y = p2[2], xend = p3[1], yend = p3[2]))+\n  geom_segment(aes(x = p3[1], y = p3[2], xend = p0[1], yend = p0[2]))+\n  theme_bw() + \n  xlim(-10, 10)+\n  ylim(0, 20)+\n  labs(x = \"x\", \n       y = \"y\")\n\n(det(A))\n\n\n[1] 44\n\n\n\n\n\nFigure 4: Matrix 3.1 on a Graph.\n\n\n\n\n\n\n\n\n Here we see that the area is the same, as the determinant remains as 44. However, we see that the shape is pulled vertically up by a significant amount. As it is pulled up it seems it narrows in width.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-b-2",
+    "href": "Lab3/Lab3WriteUp.html#part-b-2",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "3.2 Part b",
+    "text": "3.2 Part b\nUse the following to generate a new shape. Compare the shape and its area to your answer in Questions 1 and the vertical shear transform in part (a). \\[ \\mathbf{M}_h = \\begin{bmatrix} 1 & 0 \\\\ k=0.5 & 1 \\end{bmatrix}~~~~~ \\textrm{and} ~~~~~\n  \\mathbf{A}   = \\begin{bmatrix} 1 & -7 \\\\ 5 & 9 \\end{bmatrix}\\]\nSolution\n\n\n(Mh = matrix(c(1,0.5,0,1),2,2))\n\n     [,1] [,2]\n[1,]  1.0    0\n[2,]  0.5    1\n\n(A = matrix(c(1,5,-7,9),2,2))\n\n     [,1] [,2]\n[1,]    1   -7\n[2,]    5    9\n\n(T = A%*%Mh)\n\n     [,1] [,2]\n[1,] -2.5   -7\n[2,]  9.5    9\n\n(p0 = c(0,0))\n\n[1] 0 0\n\n(p1 = T[,1])\n\n[1] -2.5  9.5\n\n(p2 = T[,1]+T[,2])\n\n[1] -9.5 18.5\n\n(p3 = T[,2])\n\n[1] -7  9\n\n\n\n\n\n\nCode\nggplot() +\n  geom_segment(aes(x = p0[1], y = p0[2], xend = p1[1], yend = p1[2]))+\n  geom_segment(aes(x = p1[1], y = p1[2], xend = p2[1], yend = p2[2]))+\n  geom_segment(aes(x = p2[1], y = p2[2], xend = p3[1], yend = p3[2]))+\n  geom_segment(aes(x = p3[1], y = p3[2], xend = p0[1], yend = p0[2]))+\n  theme_bw() + \n  xlim(-10, 10)+\n  ylim(0, 20)+\n  labs(x = \"x\", \n       y = \"y\")\n\n(det(A))\n\n\n[1] 44\n\n\n\n\n\nFigure 5: Matrix 3.2 on a Graph.\n\n\n\n\n\n\n\n\n Here, we once again see the area to be the same, but as compared to the shape in Question 1 and in Part 3a, the parallelogram is much skinnier, almost resembling a rhombus. The shape has been squished more horizontally, which has also made it increase in height as well relative to the Question 1 shape.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-c-2",
+    "href": "Lab3/Lab3WriteUp.html#part-c-2",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "3.3 Part c",
+    "text": "3.3 Part c\nCan we shear vertically and horizontally at the same time? Use the following to generate a new shape. Compare the shape and its area to your answers in parts (a) and (b). \\[\\mathbf{M}_{vh} = \\begin{bmatrix} 1 & k=0.5 \\\\ k=0.5 & 1 \\end{bmatrix} ~~~~~ \\textrm{and} ~~~~~\n  \\mathbf{A}   = \\begin{bmatrix} 1 & -7 \\\\ 5 & 9 \\end{bmatrix}\\]\nSolution\n\n\n(Mvh = matrix(c(1,0.5,0.5,1),2,2))\n\n     [,1] [,2]\n[1,]  1.0  0.5\n[2,]  0.5  1.0\n\n(A = matrix(c(1,5,-7,9),2,2))\n\n     [,1] [,2]\n[1,]    1   -7\n[2,]    5    9\n\n(T = A%*%Mvh)\n\n     [,1] [,2]\n[1,] -2.5 -6.5\n[2,]  9.5 11.5\n\n(p0 = c(0,0))\n\n[1] 0 0\n\n(p1 = T[,1])\n\n[1] -2.5  9.5\n\n(p2 = T[,1]+T[,2])\n\n[1] -9 21\n\n(p3 = T[,2])\n\n[1] -6.5 11.5\n\n\n\n\n\n\nCode\nggplot() +\n  geom_segment(aes(x = p0[1], y = p0[2], xend = p1[1], yend = p1[2]))+\n  geom_segment(aes(x = p1[1], y = p1[2], xend = p2[1], yend = p2[2]))+\n  geom_segment(aes(x = p2[1], y = p2[2], xend = p3[1], yend = p3[2]))+\n  geom_segment(aes(x = p3[1], y = p3[2], xend = p0[1], yend = p0[2]))+\n  theme_bw() + \n  xlim(-10, 2)+\n  ylim(0, 22)+\n  labs(x = \"x\", \n       y = \"y\")\n\n(det(A))\n\n\n[1] 44\n\n\n\n\n\nFigure 6: Matrix 3.3 on a Graph.\n\n\n\n\n\n\n\n\n Here, the area is again the same, due to the invariant determinant. Comparing to parts a and b, this shape is much more tilted to the left, and is squished much more into a narrower shape. The left lean is much more prominent and we can see the shape being both suqished horizontally while also being stretched in the vertical direction.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-a-3",
+    "href": "Lab3/Lab3WriteUp.html#part-a-3",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "4.1 Part a",
+    "text": "4.1 Part a\nCreate a data frame ladder with the following data. Note your data frame should have three columns; I split it to save vertical space here.\n\n\n\nx\ny\ngroup\nx\ny\ngroup\n\n\n\n\n0\n0\n1\n1\n8\n6\n\n\n0\n20\n1\n0\n10\n7\n\n\n1\n0\n2\n1\n10\n7\n\n\n1\n20\n2\n0\n12\n8\n\n\n0\n2\n3\n1\n12\n8\n\n\n1\n2\n3\n0\n14\n9\n\n\n0\n4\n4\n1\n14\n9\n\n\n1\n4\n4\n0\n16\n10\n\n\n0\n6\n5\n1\n16\n10\n\n\n1\n6\n5\n0\n18\n11\n\n\n0\n8\n6\n1\n18\n11\n\n\n\nSolution\n\n\n(x=c(c(0,0,1,1),rep(c(0,1),times=9)))\n\n [1] 0 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1\n\n(y=c(c(0,20,0,20),rep(seq(from=2,to=18,by=2),each=2)))\n\n [1]  0 20  0 20  2  2  4  4  6  6  8  8 10 10 12 12 14 14 16 16 18 18\n\n(group = rep(seq(from=1,to=11),each=2))\n\n [1]  1  1  2  2  3  3  4  4  5  5  6  6  7  7  8  8  9  9 10 10 11 11\n\nladder = data.frame(\"x\"= x, \"y\"=y, \"group\" = group)\n(ladder)\n\n   x  y group\n1  0  0     1\n2  0 20     1\n3  1  0     2\n4  1 20     2\n5  0  2     3\n6  1  2     3\n7  0  4     4\n8  1  4     4\n9  0  6     5\n10 1  6     5\n11 0  8     6\n12 1  8     6\n13 0 10     7\n14 1 10     7\n15 0 12     8\n16 1 12     8\n17 0 14     9\n18 1 14     9\n19 0 16    10\n20 1 16    10\n21 0 18    11\n22 1 18    11",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-b-3",
+    "href": "Lab3/Lab3WriteUp.html#part-b-3",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "4.2 Part b",
+    "text": "4.2 Part b\nRemove #|eval: false in the code below. The result should look like a ladder and a very rectangular house if part a is correct.\nSolution\n\n\n\nCode\nggplot() +\n  geom_path(data = ladder, \n              aes(x = x, y = y, group = group)) +\n                  geom_segment(aes(x = 10, xend = 10,\n                   y=0, yend = 20))+\n  geom_segment(aes(x = 10, xend = 20,\n                   y=20, yend = 20))+\n  geom_segment(aes(x = 20, xend = 20,\n                   y=0, yend = 20))+\n  geom_segment(aes(x = 10, xend = 20,\n                   y=0, yend = 0)) +\n  theme_bw() +\n  xlim(-2,22) +\n  ylim(-2,22)\n\n\n\n\n\nFigure 7: A ladder.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-c-3",
+    "href": "Lab3/Lab3WriteUp.html#part-c-3",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "4.3 Part c",
+    "text": "4.3 Part c\nUse as.matrix() to create a \\(22 \\times 2\\) matrix \\(\\mathbf{A}\\) containing the x and y observations from the ladder data frame. Use matrix multiplication to compute \\[\\mathbf{T} = \\mathbf{A} \\mathbf{M}_h.\\] Recall, \\[\\mathbf{M}_h = \\begin{bmatrix} 1 & 0 \\\\ k & 1 \\end{bmatrix}\\] and use \\(k=0.5.\\)\nSolution\n\n\nA = as.matrix(ladder[,c(\"x\",\"y\")])\n(A)\n\n      x  y\n [1,] 0  0\n [2,] 0 20\n [3,] 1  0\n [4,] 1 20\n [5,] 0  2\n [6,] 1  2\n [7,] 0  4\n [8,] 1  4\n [9,] 0  6\n[10,] 1  6\n[11,] 0  8\n[12,] 1  8\n[13,] 0 10\n[14,] 1 10\n[15,] 0 12\n[16,] 1 12\n[17,] 0 14\n[18,] 1 14\n[19,] 0 16\n[20,] 1 16\n[21,] 0 18\n[22,] 1 18\n\nMh = matrix(c(1,0.5,0,1),2,2)\n(Mh)\n\n     [,1] [,2]\n[1,]  1.0    0\n[2,]  0.5    1\n\nT = A%*%Mh\n(T)\n\n      [,1] [,2]\n [1,]    0    0\n [2,]   10   20\n [3,]    1    0\n [4,]   11   20\n [5,]    1    2\n [6,]    2    2\n [7,]    2    4\n [8,]    3    4\n [9,]    3    6\n[10,]    4    6\n[11,]    4    8\n[12,]    5    8\n[13,]    5   10\n[14,]    6   10\n[15,]    6   12\n[16,]    7   12\n[17,]    7   14\n[18,]    8   14\n[19,]    8   16\n[20,]    9   16\n[21,]    9   18\n[22,]   10   18",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-d-2",
+    "href": "Lab3/Lab3WriteUp.html#part-d-2",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "4.4 Part d",
+    "text": "4.4 Part d\nCreate a data frame leaning.ladder with the x and y equal to the first and second column of \\(\\mathbf{T}\\), respectively, and the same values of group from ladder.\nSolution\n\n\nleaning.ladder=data.frame(\"x\" = T[,1], \"y\" = T[,2], \"group\" = ladder[,c(\"group\")])\n(leaning.ladder)\n\n    x  y group\n1   0  0     1\n2  10 20     1\n3   1  0     2\n4  11 20     2\n5   1  2     3\n6   2  2     3\n7   2  4     4\n8   3  4     4\n9   3  6     5\n10  4  6     5\n11  4  8     6\n12  5  8     6\n13  5 10     7\n14  6 10     7\n15  6 12     8\n16  7 12     8\n17  7 14     9\n18  8 14     9\n19  8 16    10\n20  9 16    10\n21  9 18    11\n22 10 18    11",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  },
+  {
+    "objectID": "Lab3/Lab3WriteUp.html#part-e-2",
+    "href": "Lab3/Lab3WriteUp.html#part-e-2",
+    "title": "Lab Three – Matrices and Data Frames in R",
+    "section": "4.5 Part e",
+    "text": "4.5 Part e\nRemove eval: false in the code below. The result should look like a ladder and a very rectangular house if part a is correct. The new leaning ladder should look like it is leaning on the house.\nSolution\n\n\n\nCode\nggplot() +\n  geom_path(data = ladder, \n              aes(x = x, y = y, group = group, color = \"Starting Ladder\")) +\n  geom_path(data = leaning.ladder, \n              aes(x = x, y = y, group = group, color = \"Leaning Ladder\")) +\n  geom_segment(aes(x = 10, xend = 10,\n                   y=0, yend = 20))+\n  geom_segment(aes(x = 10, xend = 20,\n                   y=20, yend = 20))+\n  geom_segment(aes(x = 20, xend = 20,\n                   y=0, yend = 20))+\n  geom_segment(aes(x = 10, xend = 20,\n                   y=0, yend = 0)) +\n  theme_bw() +\n  xlim(-2,22) +\n  ylim(-2,22) +\n  scale_color_manual(\"\", values=c(\"darkred\", \"grey\"))\n\n\n\n\n\nFigure 8: A ladder and a leaning ladder.",
+    "crumbs": [
+      "Lab Three -- Matrices and Data Frames in R"
+    ]
+  }
+]
