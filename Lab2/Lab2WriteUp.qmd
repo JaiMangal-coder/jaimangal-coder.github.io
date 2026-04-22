@@ -79,6 +79,8 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 Install the `esquisse` package for `R`. Report the code below, ensuring to set the `eval` option to `false`, using "\#| eval: false", so that we don't install the package every time you compile your Quarto document.
 
 **Solution**
+Here, I just installed the package.
+
 ```{r}
 #| eval: false
 #| size: "scriptsize"
@@ -89,6 +91,8 @@ install.packages('esquisse')
 Load the `esquisse` package for `R`. Report the code below. It does not matter whether you set "\#| eval: false" because loading the package does not add a lot of time. Note you will not evaluate any code that uses the `esquisse` package, so there is no need to load it as you compile your Quarto document.
 
 **Solution**
+Here, I loaded the now installed package.
+
 ```{r}
 #| eval: false
 #| size: "scriptsize"
@@ -99,6 +103,8 @@ library('esquisse')
 How can you ask for help about the  `esquisse` package for `R`? Report the code below, ensuring to set the `eval` option to `false`, using "\#| eval: false", so that the help document isn't loaded every time you compile your Quarto document.
 
 **Solution**
+I use the help function get some documentation on the package.
+
 ```{r}
 #| eval: false
 #| size: "scriptsize"
@@ -108,10 +114,21 @@ help(esquisser)
 ## Part d
 Is a demo or vignette available for the  `esquisse` package for `R`? Report the code below, ensuring to set the `eval` option to `false`, using "\#| eval: false", so that the you don't get errors when you compile your Quarto document.
 
+**Solution**
+A vignette is available using a specified vignette and package. 
+
+```{r}
+#| eval: false
+
+
+vignette("get-started", package = "esquisse")
+```
+
 ## Part e
 Add the BibTeX citation for `esquisse` package for `R` to your `.bib` file and cite it in a sentence describing what the package does below. Note you can reference a citation named `esquisse` using "[@\hspace{-0em}esquisse]".
 <!-- Note the \hspace{-0em} above is for printing 
 the command instead of actually citing. -->
+
 
 ## Part f
 Run `esquisser()` in your console -- not in a chunk of `R` code in your Quarto document. 

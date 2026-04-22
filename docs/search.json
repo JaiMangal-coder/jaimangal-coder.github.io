@@ -654,7 +654,7 @@
     "href": "Lab2/Lab2WriteUp.html#part-a",
     "title": "Lab Two – Basic Tasks in R",
     "section": "1.1 Part a",
-    "text": "1.1 Part a\nInstall the esquisse package for R. Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that we don’t install the package every time you compile your Quarto document.\nSolution\n\n\n\nCode\ninstall.packages('esquisse')",
+    "text": "1.1 Part a\nInstall the esquisse package for R. Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that we don’t install the package every time you compile your Quarto document.\nSolution Here, I just installed the package.\n\n\n\nCode\ninstall.packages('esquisse')",
     "crumbs": [
       "Lab Two -- Basic Tasks in R"
     ]
@@ -664,7 +664,7 @@
     "href": "Lab2/Lab2WriteUp.html#part-b",
     "title": "Lab Two – Basic Tasks in R",
     "section": "1.2 Part b",
-    "text": "1.2 Part b\nLoad the esquisse package for R. Report the code below. It does not matter whether you set “#| eval: false” because loading the package does not add a lot of time. Note you will not evaluate any code that uses the esquisse package, so there is no need to load it as you compile your Quarto document.\nSolution\n\n\n\nCode\nlibrary('esquisse')",
+    "text": "1.2 Part b\nLoad the esquisse package for R. Report the code below. It does not matter whether you set “#| eval: false” because loading the package does not add a lot of time. Note you will not evaluate any code that uses the esquisse package, so there is no need to load it as you compile your Quarto document.\nSolution Here, I loaded the now installed package.\n\n\n\nCode\nlibrary('esquisse')",
     "crumbs": [
       "Lab Two -- Basic Tasks in R"
     ]
@@ -674,7 +674,7 @@
     "href": "Lab2/Lab2WriteUp.html#part-c",
     "title": "Lab Two – Basic Tasks in R",
     "section": "1.3 Part c",
-    "text": "1.3 Part c\nHow can you ask for help about the esquisse package for R? Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that the help document isn’t loaded every time you compile your Quarto document.\nSolution\n\n\n\nCode\nhelp(esquisser)",
+    "text": "1.3 Part c\nHow can you ask for help about the esquisse package for R? Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that the help document isn’t loaded every time you compile your Quarto document.\nSolution I use the help function get some documentation on the package.\n\n\n\nCode\nhelp(esquisser)",
     "crumbs": [
       "Lab Two -- Basic Tasks in R"
     ]
@@ -684,7 +684,7 @@
     "href": "Lab2/Lab2WriteUp.html#part-d",
     "title": "Lab Two – Basic Tasks in R",
     "section": "1.4 Part d",
-    "text": "1.4 Part d\nIs a demo or vignette available for the esquisse package for R? Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that the you don’t get errors when you compile your Quarto document.",
+    "text": "1.4 Part d\nIs a demo or vignette available for the esquisse package for R? Report the code below, ensuring to set the eval option to false, using “#| eval: false”, so that the you don’t get errors when you compile your Quarto document.\nSolution A vignette is available using a specified vignette and package.\n\n\n\nCode\nvignette(\"get-started\", package = \"esquisse\")",
     "crumbs": [
       "Lab Two -- Basic Tasks in R"
     ]
