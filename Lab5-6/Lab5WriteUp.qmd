@@ -647,7 +647,7 @@ dat.bal.cleaned |>
     "Excess Kurtosis" = e1071::kurtosis(price),
     Skew = e1071::skewness(price)
   ) |>
-  knitr::kable()
+  knitr::kable(digits = 2)
 ```
 
 Here, we obviously see an inverse relationship between ship age and age. As ships get older, their price gradually decreases. There are a few outliers, but this can most likely be attributed to specific ship features and/or specialties which boost prices. 
