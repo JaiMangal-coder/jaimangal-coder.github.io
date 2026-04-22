@@ -123,7 +123,7 @@ We first need to make Matrix M:
 ```{r}
 #| size: "scriptsize"
 #| code-fold: FALSE
-# I'm going to annoy you with using only by column
+#| 
 (M = matrix(c(1,0,0,1),nrow = 2,ncol = 2)) 
 ```
 
@@ -357,7 +357,7 @@ ggplot() +
   labs(x = "x", 
        y = "y")
 
-(det(A))
+(det(T))
 ```
 Here we see that the area is the same, as the determinant remains as 44. However, we see that the shape is pulled vertically up by a significant amount. As it is pulled up it seems it narrows in width. 
 
@@ -401,7 +401,7 @@ ggplot() +
   labs(x = "x", 
        y = "y")
 
-(det(A))
+(det(T))
 ```
 Here, we once again see the area to be the same, but as compared to the shape in Question 1 and in Part 3a, the parallelogram is much skinnier, almost resembling a rhombus. The shape has been squished more horizontally, which has also made it increase in height as well relative to the Question 1 shape. 
 
@@ -443,7 +443,7 @@ ggplot() +
   labs(x = "x", 
        y = "y")
 
-(det(A))
+(det(T))
 ```
 Here, the area is again the same, due to the invariant determinant. Comparing to parts a and b, this shape is much more tilted to the left, and is squished much more into a narrower shape. The left lean is much more prominent and we can see the shape being both suqished horizontally while also being stretched in the vertical direction. 
 
