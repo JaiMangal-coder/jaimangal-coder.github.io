@@ -33,6 +33,6 @@ format:
 format-links: [pdf]
 ---
 
-## Overview
+## Introduction
 
-This page reviews important ideas from Unit 2: the **tidyverse** and **ggplot2**. 
+Unit 2 focused on two tools for data analysis in R: the **tidyverse** and **ggplot2**. The tidyverse provides an easy and clean way to import, transform, and summarize data. ggplot2 provides a flexible system for building graphs that clearly 
