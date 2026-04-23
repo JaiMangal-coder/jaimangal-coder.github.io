@@ -238,6 +238,12 @@ window.Quarto = {
  <span class="menu-text">Lab Eleven – Point Estimation and Resampling</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Unit2Review/review.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unit 2 Review – tidyverse and ggplot</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -337,7 +343,7 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 \end{align*}\]</span></p>
 <p>Thus, I can use the CDF function (pbinom) to easily calculate this probability. I’ve also plotted both CDF and PMF below, highlighting the probability we were calculating for.</p>
 <p></p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>win_percent <span class="ot">=</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">pbinom</span>(<span class="at">q=</span><span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">3</span>)</span>
@@ -376,9 +382,9 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <span id="cb3-26"><a href="#cb3-26"></a>PMF.plot <span class="sc">|</span> CDF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Lab8WriteUp_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Lab8WriteUp_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -394,7 +400,7 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <p><span class="math display">\[P(X \leq 1) = F_X(1)\]</span></p>
 <p>I get the same result as I did for the binomial distribution.</p>
 <p></p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>win_percent <span class="ot">=</span> <span class="fu">pnbinom</span>(<span class="at">q=</span><span class="dv">1</span>, <span class="at">prob=</span><span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">2</span>)</span>
@@ -433,9 +439,9 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <span id="cb6-26"><a href="#cb6-26"></a>PMF.plot <span class="sc">|</span> CDF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="Lab8WriteUp_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Lab8WriteUp_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -563,18 +569,18 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <span id="cb14-5"><a href="#cb14-5"></a>  )</span>
 <span id="cb14-6"><a href="#cb14-6"></a></span>
 <span id="cb14-7"><a href="#cb14-7"></a>PDF.plot <span class="ot">=</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb14-8"><a href="#cb14-8"></a>  <span class="fu">geom_linerange</span>(<span class="at">data=</span>ggdat,<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PDF), </span>
+<span id="cb14-8"><a href="#cb14-8"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>ggdat,<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> PDF), </span>
 <span id="cb14-9"><a href="#cb14-9"></a>                  <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb14-10"><a href="#cb14-10"></a>  <span class="fu">geom_linerange</span>(<span class="at">data=</span>ggdat <span class="sc">|&gt;</span> <span class="fu">filter</span>(x <span class="sc">&gt;=</span><span class="fl">0.5</span>),</span>
+<span id="cb14-10"><a href="#cb14-10"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data=</span>ggdat <span class="sc">|&gt;</span> <span class="fu">filter</span>(x <span class="sc">&gt;=</span><span class="fl">0.5</span>),</span>
 <span id="cb14-11"><a href="#cb14-11"></a>                <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PDF),</span>
-<span id="cb14-12"><a href="#cb14-12"></a>                <span class="at">color =</span> <span class="st">"darkorchid2"</span>, <span class="at">linewidth=</span><span class="dv">1</span>, <span class="at">alpha=</span><span class="fl">0.15</span>) <span class="sc">+</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a>                <span class="at">fill =</span> <span class="st">"darkorchid2"</span>, <span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb14-13"><a href="#cb14-13"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
 <span id="cb14-14"><a href="#cb14-14"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">"x"</span>, <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.2</span>)) <span class="sc">+</span></span>
 <span id="cb14-15"><a href="#cb14-15"></a>  <span class="fu">ylab</span>(<span class="st">"Density"</span>) <span class="sc">+</span></span>
 <span id="cb14-16"><a href="#cb14-16"></a>  <span class="fu">theme_bw</span>()</span>
 <span id="cb14-17"><a href="#cb14-17"></a></span>
 <span id="cb14-18"><a href="#cb14-18"></a>CDF.plot <span class="ot">=</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb14-19"><a href="#cb14-19"></a>  <span class="fu">geom_step</span>(<span class="at">data =</span> ggdat, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> CDF)) <span class="sc">+</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> ggdat, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> CDF)) <span class="sc">+</span></span>
 <span id="cb14-20"><a href="#cb14-20"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> ggdat <span class="sc">|&gt;</span> <span class="fu">filter</span>(x<span class="sc">==</span><span class="dv">1</span>), </span>
 <span id="cb14-21"><a href="#cb14-21"></a>            <span class="fu">aes</span>(<span class="at">x =</span> <span class="fl">0.5</span>, <span class="at">y =</span> <span class="fu">pbeta</span>(<span class="at">q=</span><span class="fl">0.5</span>,<span class="dv">7</span>,<span class="dv">3</span>)),</span>
 <span id="cb14-22"><a href="#cb14-22"></a>            <span class="at">color=</span><span class="st">"darkorchid2"</span>, <span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
@@ -589,7 +595,7 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>At least 50% win probability</figcaption>
-<p><img src="Lab8WriteUp_files/figure-html/atleast50-1.png" class="img-fluid figure-img" width="768"></p>
+<p><img src="Lab8WriteUp_files/figure-html/atleast50-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -623,18 +629,18 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <span id="cb17-5"><a href="#cb17-5"></a>  )</span>
 <span id="cb17-6"><a href="#cb17-6"></a></span>
 <span id="cb17-7"><a href="#cb17-7"></a>PDF.plot <span class="ot">=</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb17-8"><a href="#cb17-8"></a>  <span class="fu">geom_linerange</span>(<span class="at">data =</span> ggdat,</span>
-<span id="cb17-9"><a href="#cb17-9"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PDF)) <span class="sc">+</span></span>
-<span id="cb17-10"><a href="#cb17-10"></a>  <span class="fu">geom_linerange</span>(<span class="at">data =</span> ggdat <span class="sc">|&gt;</span> <span class="fu">filter</span>(x <span class="sc">&lt;=</span> q_90),</span>
+<span id="cb17-8"><a href="#cb17-8"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> ggdat,</span>
+<span id="cb17-9"><a href="#cb17-9"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> PDF)) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> ggdat <span class="sc">|&gt;</span> <span class="fu">filter</span>(x <span class="sc">&lt;=</span> q_90),</span>
 <span id="cb17-11"><a href="#cb17-11"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PDF),</span>
-<span id="cb17-12"><a href="#cb17-12"></a>                 <span class="at">color =</span> <span class="st">"darkorchid2"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.15</span>) <span class="sc">+</span></span>
+<span id="cb17-12"><a href="#cb17-12"></a>                 <span class="at">fill =</span> <span class="st">"darkorchid2"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb17-13"><a href="#cb17-13"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
 <span id="cb17-14"><a href="#cb17-14"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">"x"</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span> <span class="fl">0.2</span>)) <span class="sc">+</span></span>
 <span id="cb17-15"><a href="#cb17-15"></a>  <span class="fu">ylab</span>(<span class="st">"Density"</span>) <span class="sc">+</span></span>
 <span id="cb17-16"><a href="#cb17-16"></a>  <span class="fu">theme_bw</span>()</span>
 <span id="cb17-17"><a href="#cb17-17"></a></span>
 <span id="cb17-18"><a href="#cb17-18"></a>CDF.plot <span class="ot">=</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb17-19"><a href="#cb17-19"></a>  <span class="fu">geom_step</span>(<span class="at">data =</span> ggdat, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> CDF)) <span class="sc">+</span></span>
+<span id="cb17-19"><a href="#cb17-19"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> ggdat, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> CDF)) <span class="sc">+</span></span>
 <span id="cb17-20"><a href="#cb17-20"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> q_90, <span class="at">y =</span> <span class="fl">0.90</span>),</span>
 <span id="cb17-21"><a href="#cb17-21"></a>             <span class="at">color =</span> <span class="st">"darkorchid2"</span>, <span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb17-22"><a href="#cb17-22"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
@@ -860,11 +866,12 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <span id="cb37-29"><a href="#cb37-29"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PMF, <span class="at">color =</span> <span class="fu">factor</span>(theta))) <span class="sc">+</span></span>
 <span id="cb37-30"><a href="#cb37-30"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
 <span id="cb37-31"><a href="#cb37-31"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">"x"</span>, <span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb37-32"><a href="#cb37-32"></a>  <span class="fu">ylab</span>(<span class="st">"Probability"</span>) <span class="sc">+</span></span>
-<span id="cb37-33"><a href="#cb37-33"></a>  <span class="fu">theme_bw</span>()<span class="sc">+</span></span>
-<span id="cb37-34"><a href="#cb37-34"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span><span class="fu">factor</span>(theta))</span>
-<span id="cb37-35"><a href="#cb37-35"></a></span>
-<span id="cb37-36"><a href="#cb37-36"></a>PMF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb37-32"><a href="#cb37-32"></a>  <span class="fu">scale_color_discrete</span>(<span class="at">name =</span> <span class="fu">expression</span>(theta)) <span class="sc">+</span> </span>
+<span id="cb37-33"><a href="#cb37-33"></a>  <span class="fu">ylab</span>(<span class="st">"Probability"</span>) <span class="sc">+</span></span>
+<span id="cb37-34"><a href="#cb37-34"></a>  <span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb37-35"><a href="#cb37-35"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>theta, <span class="at">labeller =</span> <span class="fu">label_bquote</span>(theta <span class="sc">==</span> .(theta)))</span>
+<span id="cb37-36"><a href="#cb37-36"></a></span>
+<span id="cb37-37"><a href="#cb37-37"></a>PMF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -922,14 +929,14 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>CDF for theta = 0.5, 1, 1.5 and p = 0.7</figcaption>
+<figcaption>CDF for <span class="math inline">\(\theta\)</span> = 0.5, 1, 1.5 and p = 0.7</figcaption>
 <p><img src="Lab8WriteUp_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <p></p>
-<p>Based on the CDF plot we see that changing our theta values affects where the cumulative probability clumps up. At lower theta values, probability clumps reflecting the hot-hand effect. Once again, at theta = 1, we get a normal binomial distribution. At greater theta values, the clumpy effect is reduced, with more probability at middle values, thus more likely heading to 2-1 outcomes.</p>
+<p>Based on the CDF plot we see that changing our theta values affects where the cumulative probability clumps up. At lower <span class="math inline">\(\theta\)</span> values, probability clumps reflecting the hot-hand effect. Once again, at <span class="math inline">\(\theta\)</span> = 1, we get a normal binomial distribution. At greater theta values, the clumpy effect is reduced, with more probability at middle values, thus more likely heading to 2-1 outcomes.</p>
 </section>
 <section id="the-winning-probability" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="the-winning-probability"><span class="header-section-number">3.3</span> The Winning Probability</h2>
@@ -1006,12 +1013,12 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <span id="cb45-38"><a href="#cb45-38"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb45-39"><a href="#cb45-39"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span><span class="fu">factor</span>(theta))</span>
 <span id="cb45-40"><a href="#cb45-40"></a></span>
-<span id="cb45-41"><a href="#cb45-41"></a>PMF.plot <span class="sc">|</span> CDF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb45-41"><a href="#cb45-41"></a>PMF.plot <span class="sc">/</span> CDF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>Altham’s Multiplicative Binomial Distribution with theta = 0.5, 1,r 1.5 and p = 0.7</figcaption>
+<figcaption>Altham’s Multiplicative Binomial Distribution with <span class="math inline">\(\theta\)</span> = 0.5, 1, 1.5 and p = 0.7</figcaption>
 <p><img src="Lab8WriteUp_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
@@ -1040,41 +1047,40 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>daltbbinom <span class="ot">=</span> <span class="cf">function</span>(x, alpha, beta, theta, n){</span>
 <span id="cb46-2"><a href="#cb46-2"></a>  <span class="co">#I had an issue because integrate() passes in multiple values of p at once,</span></span>
 <span id="cb46-3"><a href="#cb46-3"></a>  <span class="co">#so I used a second sapply() to evaluate one p-value at a time</span></span>
-<span id="cb46-4"><a href="#cb46-4"></a>  <span class="co"># hence the double sapply, i wont lie i had to consult oscar for this bc i didnt understand why my PMF was not adding up to 1 before. </span></span>
-<span id="cb46-5"><a href="#cb46-5"></a></span>
-<span id="cb46-6"><a href="#cb46-6"></a>  <span class="fu">sapply</span>(x, <span class="cf">function</span>(z){ <span class="co">#apply from 0 to z in x</span></span>
-<span id="cb46-7"><a href="#cb46-7"></a>    f_x <span class="ot">=</span> <span class="cf">function</span>(p){</span>
-<span id="cb46-8"><a href="#cb46-8"></a>      <span class="fu">sapply</span>(p, <span class="cf">function</span>(m){ <span class="co">#apply from 0 to m in p (ik my naming convention sucks, i had to try a bunch of things for this to work out)</span></span>
-<span id="cb46-9"><a href="#cb46-9"></a>        <span class="fu">daltbinom</span>(<span class="at">x =</span> z, <span class="at">p =</span> m, <span class="at">theta =</span> theta, <span class="at">n =</span> n) <span class="sc">*</span> <span class="fu">dbeta</span>(m, alpha, beta)</span>
-<span id="cb46-10"><a href="#cb46-10"></a>      })</span>
-<span id="cb46-11"><a href="#cb46-11"></a>    }</span>
-<span id="cb46-12"><a href="#cb46-12"></a>    <span class="fu">integrate</span>(f_x, <span class="at">lower =</span> <span class="dv">0</span>, <span class="at">upper =</span> <span class="dv">1</span>)<span class="sc">$</span>value</span>
-<span id="cb46-13"><a href="#cb46-13"></a>  })</span>
-<span id="cb46-14"><a href="#cb46-14"></a>}</span>
-<span id="cb46-15"><a href="#cb46-15"></a></span>
-<span id="cb46-16"><a href="#cb46-16"></a>ggdat <span class="ot">=</span> <span class="fu">tibble</span>(</span>
-<span id="cb46-17"><a href="#cb46-17"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">times =</span> <span class="dv">3</span>),</span>
-<span id="cb46-18"><a href="#cb46-18"></a>  <span class="at">theta =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>), <span class="at">each =</span> <span class="dv">4</span>)</span>
-<span id="cb46-19"><a href="#cb46-19"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb46-20"><a href="#cb46-20"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb46-21"><a href="#cb46-21"></a>    <span class="at">PMF =</span> <span class="fu">case_when</span>(</span>
-<span id="cb46-22"><a href="#cb46-22"></a>      theta <span class="sc">==</span> <span class="fl">0.5</span> <span class="sc">~</span> <span class="fu">daltbbinom</span>(<span class="at">x =</span> x, <span class="at">alpha =</span> <span class="dv">7</span>, <span class="at">beta =</span> <span class="dv">3</span>, <span class="at">theta =</span> <span class="fl">0.5</span>, <span class="at">n =</span> <span class="dv">3</span>),</span>
-<span id="cb46-23"><a href="#cb46-23"></a>      theta <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="fu">daltbbinom</span>(<span class="at">x =</span> x, <span class="at">alpha =</span> <span class="dv">7</span>, <span class="at">beta =</span> <span class="dv">3</span>, <span class="at">theta =</span> <span class="dv">1</span>, <span class="at">n =</span> <span class="dv">3</span>),</span>
-<span id="cb46-24"><a href="#cb46-24"></a>      theta <span class="sc">==</span> <span class="fl">1.5</span> <span class="sc">~</span> <span class="fu">daltbbinom</span>(<span class="at">x =</span> x, <span class="at">alpha =</span> <span class="dv">7</span>, <span class="at">beta =</span> <span class="dv">3</span>, <span class="at">theta =</span> <span class="fl">1.5</span>, <span class="at">n =</span> <span class="dv">3</span>)</span>
-<span id="cb46-25"><a href="#cb46-25"></a>    )</span>
-<span id="cb46-26"><a href="#cb46-26"></a>  )</span>
-<span id="cb46-27"><a href="#cb46-27"></a></span>
-<span id="cb46-28"><a href="#cb46-28"></a>PMF.plot <span class="ot">=</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb46-29"><a href="#cb46-29"></a>  <span class="fu">geom_linerange</span>(<span class="at">data =</span> ggdat,</span>
-<span id="cb46-30"><a href="#cb46-30"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PMF),</span>
-<span id="cb46-31"><a href="#cb46-31"></a>                 <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"darkorchid2"</span>) <span class="sc">+</span></span>
-<span id="cb46-32"><a href="#cb46-32"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb46-33"><a href="#cb46-33"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">"x"</span>, <span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb46-34"><a href="#cb46-34"></a>  <span class="fu">ylab</span>(<span class="st">"Probability"</span>) <span class="sc">+</span></span>
-<span id="cb46-35"><a href="#cb46-35"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb46-36"><a href="#cb46-36"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span><span class="fu">factor</span>(theta))</span>
-<span id="cb46-37"><a href="#cb46-37"></a></span>
-<span id="cb46-38"><a href="#cb46-38"></a>PMF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb46-4"><a href="#cb46-4"></a></span>
+<span id="cb46-5"><a href="#cb46-5"></a>  <span class="fu">sapply</span>(x, <span class="cf">function</span>(z){ <span class="co">#apply from 0 to z in x</span></span>
+<span id="cb46-6"><a href="#cb46-6"></a>    f_x <span class="ot">=</span> <span class="cf">function</span>(p){</span>
+<span id="cb46-7"><a href="#cb46-7"></a>      <span class="fu">sapply</span>(p, <span class="cf">function</span>(m){ <span class="co">#apply from 0 to m in p </span></span>
+<span id="cb46-8"><a href="#cb46-8"></a>        <span class="fu">daltbinom</span>(<span class="at">x =</span> z, <span class="at">p =</span> m, <span class="at">theta =</span> theta, <span class="at">n =</span> n) <span class="sc">*</span> <span class="fu">dbeta</span>(m, alpha, beta)</span>
+<span id="cb46-9"><a href="#cb46-9"></a>      })</span>
+<span id="cb46-10"><a href="#cb46-10"></a>    }</span>
+<span id="cb46-11"><a href="#cb46-11"></a>    <span class="fu">integrate</span>(f_x, <span class="at">lower =</span> <span class="dv">0</span>, <span class="at">upper =</span> <span class="dv">1</span>)<span class="sc">$</span>value</span>
+<span id="cb46-12"><a href="#cb46-12"></a>  })</span>
+<span id="cb46-13"><a href="#cb46-13"></a>}</span>
+<span id="cb46-14"><a href="#cb46-14"></a></span>
+<span id="cb46-15"><a href="#cb46-15"></a>ggdat <span class="ot">=</span> <span class="fu">tibble</span>(</span>
+<span id="cb46-16"><a href="#cb46-16"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">times =</span> <span class="dv">3</span>),</span>
+<span id="cb46-17"><a href="#cb46-17"></a>  <span class="at">theta =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>), <span class="at">each =</span> <span class="dv">4</span>)</span>
+<span id="cb46-18"><a href="#cb46-18"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb46-19"><a href="#cb46-19"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb46-20"><a href="#cb46-20"></a>    <span class="at">PMF =</span> <span class="fu">case_when</span>(</span>
+<span id="cb46-21"><a href="#cb46-21"></a>      theta <span class="sc">==</span> <span class="fl">0.5</span> <span class="sc">~</span> <span class="fu">daltbbinom</span>(<span class="at">x =</span> x, <span class="at">alpha =</span> <span class="dv">7</span>, <span class="at">beta =</span> <span class="dv">3</span>, <span class="at">theta =</span> <span class="fl">0.5</span>, <span class="at">n =</span> <span class="dv">3</span>),</span>
+<span id="cb46-22"><a href="#cb46-22"></a>      theta <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="fu">daltbbinom</span>(<span class="at">x =</span> x, <span class="at">alpha =</span> <span class="dv">7</span>, <span class="at">beta =</span> <span class="dv">3</span>, <span class="at">theta =</span> <span class="dv">1</span>, <span class="at">n =</span> <span class="dv">3</span>),</span>
+<span id="cb46-23"><a href="#cb46-23"></a>      theta <span class="sc">==</span> <span class="fl">1.5</span> <span class="sc">~</span> <span class="fu">daltbbinom</span>(<span class="at">x =</span> x, <span class="at">alpha =</span> <span class="dv">7</span>, <span class="at">beta =</span> <span class="dv">3</span>, <span class="at">theta =</span> <span class="fl">1.5</span>, <span class="at">n =</span> <span class="dv">3</span>)</span>
+<span id="cb46-24"><a href="#cb46-24"></a>    )</span>
+<span id="cb46-25"><a href="#cb46-25"></a>  )</span>
+<span id="cb46-26"><a href="#cb46-26"></a></span>
+<span id="cb46-27"><a href="#cb46-27"></a>PMF.plot <span class="ot">=</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb46-28"><a href="#cb46-28"></a>  <span class="fu">geom_linerange</span>(<span class="at">data =</span> ggdat,</span>
+<span id="cb46-29"><a href="#cb46-29"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> PMF),</span>
+<span id="cb46-30"><a href="#cb46-30"></a>                 <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"darkorchid2"</span>) <span class="sc">+</span></span>
+<span id="cb46-31"><a href="#cb46-31"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb46-32"><a href="#cb46-32"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">"x"</span>, <span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb46-33"><a href="#cb46-33"></a>  <span class="fu">ylab</span>(<span class="st">"Probability"</span>) <span class="sc">+</span></span>
+<span id="cb46-34"><a href="#cb46-34"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb46-35"><a href="#cb46-35"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span><span class="fu">factor</span>(theta))</span>
+<span id="cb46-36"><a href="#cb46-36"></a></span>
+<span id="cb46-37"><a href="#cb46-37"></a>PMF.plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1214,7 +1220,7 @@ P(X \geq 2) &amp;= 1 - P(X&lt;2)\\
 </div>
 </div>
 <p></p>
-<p>The binomial model assumes a fixed leg-win probability of 0.7. So we see a higher trend to 2 and 3 wins. In fact, in all the models it is most probable that Player A’s record is 2-0 in the game. The negative binomial shows the same idea. The beta-binomial is similar but allows the leg-win probability to vary very slightly to adjust for more realistic variations. The Altham Binomial models show how dependencies between legs affect overall outcome. With lower thetas, wins stack and clump together, creating more 2-0 or 0-2 chances, while the opposite is true for higher thetas, creating more 2-1 or 1-2 chances. Combining the Altham with the Beta Binomial we get the combination of leg dependency and variations in leg-win probability. Overall, each model does better with different scenarios. The Altham Beta-Binomial model does well to show hot-hand behavior with varying performance through a match. But, depending on environment and set up, each model will better illustrate those varying systems.</p>
+<p>The binomial model assumes a fixed leg-win probability of 0.7. So we see a higher trend to 2 and 3 wins. In fact, in all the models it is most probable that Player A’s record is 2-0 in the game. The negative binomial shows the same idea. The beta-binomial is similar but allows the leg-win probability to vary very slightly to adjust for more realistic variations. The Altham Binomial models show how clumping affects the overall outcome. With lower thetas, wins stack and clump together, creating more 2-0 or 0-2 chances, while the opposite is true for higher thetas, creating more 2-1 or 1-2 chances. Combining the Altham with the Beta Binomial we get the combination of leg dependency and variations in leg-win probability. Overall, each model does better with different scenarios. The Altham Beta-Binomial model does well to show hot-hand behavior with varying performance through a match. But, depending on environment and set up, each model will better illustrate those varying systems.</p>
 
 
 
