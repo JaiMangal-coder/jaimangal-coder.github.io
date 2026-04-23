@@ -19,7 +19,7 @@ website:
       - Lab8/Lab8WriteUp.qmd
       - Lab10/Lab10WriteUp.qmd
       - Lab11/Lab11WriteUp.qmd
-      - Unit 2 Review/review.qmd
+      - Unit2Review/review.qmd
 
 format:
   html:
